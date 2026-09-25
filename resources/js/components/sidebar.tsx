@@ -26,7 +26,7 @@ import { UserAvatar } from '@/components/user-avatar';
 import { useAppearance } from '@/lib/appearance';
 import { useCan } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
-import { dashboard } from '@/routes';
+import { dashboard, home } from '@/routes';
 import dogsRoutes from '@/routes/dogs';
 import settingsRoutes from '@/routes/settings';
 import type { Auth, User } from '@/types/auth';
@@ -182,18 +182,27 @@ export function Sidebar({
                     !open && 'flex-col gap-2',
                 )}
             >
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-lg ring-4 shadow-black/20 ring-white/10">
-                    <AppLogo className="size-full" />
-                </div>
-                {open && (
-                    <p className="min-w-0 flex-1 text-sm leading-tight font-semibold">
-                        Second Chance
-                        <br />
-                        <span className="text-xs font-medium text-brand-300">
-                            Animal Sanctuary
+                <Link
+                    href={home.url()}
+                    title="Go to the landing page"
+                    className={cn(
+                        'group flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
+                        open && 'flex-1',
+                    )}
+                >
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white p-1.5 shadow-lg ring-4 shadow-black/20 ring-white/10 transition-transform group-hover:scale-105">
+                        <AppLogo className="size-full" />
+                    </span>
+                    {open && (
+                        <span className="min-w-0 text-sm leading-tight font-semibold">
+                            Second Chance
+                            <br />
+                            <span className="text-xs font-medium text-brand-300 group-hover:text-brand-200">
+                                Animal Sanctuary
+                            </span>
                         </span>
-                    </p>
-                )}
+                    )}
+                </Link>
                 <button
                     type="button"
                     onClick={onToggle}

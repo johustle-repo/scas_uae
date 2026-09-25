@@ -3,8 +3,9 @@ import { MenuIcon } from '@/components/icons';
 import { AppLogo } from '@/components/app-logo';
 import { Sidebar } from '@/components/sidebar';
 import { cn } from '@/lib/utils';
+import { home } from '@/routes';
 import type { Auth } from '@/types/auth';
-import { router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { type ReactNode, useEffect, useState } from 'react';
 
 export function AuthenticatedLayout({ children }: { children: ReactNode }) {
@@ -64,12 +65,17 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
                 >
                     <MenuIcon className="size-5" />
                 </button>
-                <span className="flex size-8 items-center justify-center rounded-lg bg-white p-1">
-                    <AppLogo className="size-full" />
-                </span>
-                <span className="truncate text-sm font-semibold">
-                    Second Chance Animal Sanctuary
-                </span>
+                <Link
+                    href={home.url()}
+                    className="flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-white"
+                >
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white p-1">
+                        <AppLogo className="size-full" />
+                    </span>
+                    <span className="truncate text-sm font-semibold">
+                        Second Chance Animal Sanctuary
+                    </span>
+                </Link>
             </header>
 
             <div
