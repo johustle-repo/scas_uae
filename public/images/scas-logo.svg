@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="95 135 1065 990" role="img" aria-label="Second Chance Animal Sanctuary">
+  <ellipse cx="255" cy="572" rx="140" ry="178" transform="rotate(-24 255 572)" fill="#7E1CB6"/>
+  <ellipse cx="475" cy="345" rx="138" ry="194" transform="rotate(-4 475 345)" fill="#F51E1E"/>
+  <ellipse cx="778" cy="345" rx="138" ry="194" transform="rotate(4 778 345)" fill="#2DBB45"/>
+  <ellipse cx="1000" cy="572" rx="140" ry="178" transform="rotate(24 1000 572)" fill="#FFCC00"/>
+  <path fill="#5B0688" d="M627 540C542 540 482 610 432 675C372 755 235 820 235 945C235 1050 320 1110 400 1110C480 1110 542 1050 627 1050C712 1050 774 1110 854 1110C934 1110 1020 1050 1020 945C1020 820 882 755 822 675C772 610 712 540 627 540Z"/>
+  <path fill="#FFFFFF" d="M625 1005C560 950 455 880 455 800C455 750 490 725 535 725C580 725 605 760 625 790C645 760 670 725 715 725C760 725 795 750 795 800C795 880 690 950 625 1005Z"/>
+</svg>

@@ -1,0 +1,135 @@
+@import 'tailwindcss';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+/* Dark mode is driven by a `.dark` class on <html> (set from the viewer's appearance setting). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+
+    --color-brand-50: oklch(0.97 0.014 306);
+    --color-brand-100: oklch(0.93 0.03 305);
+    --color-brand-200: oklch(0.87 0.06 304);
+    --color-brand-300: oklch(0.78 0.1 303);
+    --color-brand-400: oklch(0.67 0.14 302);
+    --color-brand-500: oklch(0.56 0.18 301);
+    --color-brand-600: oklch(0.47 0.2 300);
+    --color-brand-700: oklch(0.4 0.19 299);
+    --color-brand-800: oklch(0.33 0.16 299);
+    --color-brand-900: oklch(0.26 0.13 299);
+    --color-brand-950: oklch(0.17 0.09 300);
+
+    --color-canvas: oklch(0.955 0.008 300);
+
+    --color-success-50: oklch(0.97 0.03 155);
+    --color-success-500: oklch(0.6 0.15 155);
+    --color-success-600: oklch(0.52 0.15 155);
+    --color-success-700: oklch(0.43 0.13 155);
+
+    --color-warning-50: oklch(0.97 0.04 85);
+    --color-warning-500: oklch(0.72 0.16 70);
+    --color-warning-600: oklch(0.62 0.16 55);
+    --color-warning-700: oklch(0.5 0.14 50);
+
+    --color-neutral-50: oklch(0.97 0.003 285);
+    --color-neutral-500: oklch(0.55 0.01 285);
+    --color-neutral-600: oklch(0.45 0.01 285);
+    --color-neutral-700: oklch(0.35 0.01 285);
+}
+
+/*
+ * Accent colour themes, selected by data-theme on <html>. Purple is the default
+ * palette defined in @theme above; these override the brand scale per theme.
+ */
+
+[data-theme='blue'] {
+    --color-brand-50: oklch(0.97 0.0133 262);
+    --color-brand-100: oklch(0.93 0.0285 262);
+    --color-brand-200: oklch(0.87 0.057 262);
+    --color-brand-300: oklch(0.78 0.095 262);
+    --color-brand-400: oklch(0.67 0.133 262);
+    --color-brand-500: oklch(0.56 0.171 262);
+    --color-brand-600: oklch(0.47 0.19 262);
+    --color-brand-700: oklch(0.4 0.18 262);
+    --color-brand-800: oklch(0.33 0.152 262);
+    --color-brand-900: oklch(0.26 0.123 262);
+    --color-brand-950: oklch(0.17 0.0855 262);
+    --color-canvas: oklch(0.955 0.008 262);
+}
+
+[data-theme='teal'] {
+    --color-brand-50: oklch(0.97 0.0084 192);
+    --color-brand-100: oklch(0.93 0.018 192);
+    --color-brand-200: oklch(0.87 0.036 192);
+    --color-brand-300: oklch(0.78 0.06 192);
+    --color-brand-400: oklch(0.67 0.084 192);
+    --color-brand-500: oklch(0.56 0.108 192);
+    --color-brand-600: oklch(0.47 0.12 192);
+    --color-brand-700: oklch(0.4 0.114 192);
+    --color-brand-800: oklch(0.33 0.096 192);
+    --color-brand-900: oklch(0.26 0.078 192);
+    --color-brand-950: oklch(0.17 0.054 192);
+    --color-canvas: oklch(0.955 0.008 192);
+}
+
+[data-theme='green'] {
+    --color-brand-50: oklch(0.97 0.0091 152);
+    --color-brand-100: oklch(0.93 0.0195 152);
+    --color-brand-200: oklch(0.87 0.039 152);
+    --color-brand-300: oklch(0.78 0.065 152);
+    --color-brand-400: oklch(0.67 0.091 152);
+    --color-brand-500: oklch(0.56 0.117 152);
+    --color-brand-600: oklch(0.47 0.13 152);
+    --color-brand-700: oklch(0.4 0.124 152);
+    --color-brand-800: oklch(0.33 0.104 152);
+    --color-brand-900: oklch(0.26 0.0845 152);
+    --color-brand-950: oklch(0.17 0.0585 152);
+    --color-canvas: oklch(0.955 0.008 152);
+}
+
+[data-theme='rose'] {
+    --color-brand-50: oklch(0.97 0.0133 12);
+    --color-brand-100: oklch(0.93 0.0285 12);
+    --color-brand-200: oklch(0.87 0.057 12);
+    --color-brand-300: oklch(0.78 0.095 12);
+    --color-brand-400: oklch(0.67 0.133 12);
+    --color-brand-500: oklch(0.56 0.171 12);
+    --color-brand-600: oklch(0.47 0.19 12);
+    --color-brand-700: oklch(0.4 0.18 12);
+    --color-brand-800: oklch(0.33 0.152 12);
+    --color-brand-900: oklch(0.26 0.123 12);
+    --color-brand-950: oklch(0.17 0.0855 12);
+    --color-canvas: oklch(0.955 0.008 12);
+}
+
+/*
+ * Page-level colours for both modes. color-scheme makes native controls
+ * (date pickers, select menus, scrollbars) follow the active mode.
+ */
+@layer base {
+    :root {
+        color-scheme: light;
+    }
+
+    :root.dark {
+        color-scheme: dark;
+    }
+
+    body {
+        @apply bg-canvas text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100;
+    }
+
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in oklch, var(--color-brand-400) 45%, transparent) transparent;
+    }
+
+    ::selection {
+        @apply bg-brand-200 text-brand-950 dark:bg-brand-700 dark:text-white;
+    }
+}

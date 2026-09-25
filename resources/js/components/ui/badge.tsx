@@ -1,0 +1,29 @@
+import { cn } from '@/lib/utils';
+import type { HTMLAttributes } from 'react';
+
+export type BadgeTone = 'brand' | 'info' | 'success' | 'warning' | 'neutral';
+
+const toneClasses: Record<BadgeTone, string> = {
+    brand: 'bg-brand-100 text-brand-800 ring-brand-200 dark:bg-brand-900/60 dark:text-brand-200 dark:ring-brand-800',
+    info: 'bg-sky-50 text-sky-700 ring-sky-200 dark:bg-sky-900/30 dark:text-sky-300 dark:ring-sky-800',
+    success: 'bg-success-50 text-success-700 ring-success-500/30 dark:bg-success-700/20 dark:text-success-500 dark:ring-success-700/40',
+    warning: 'bg-warning-50 text-warning-700 ring-warning-500/30 dark:bg-warning-700/20 dark:text-warning-500 dark:ring-warning-700/40',
+    neutral: 'bg-neutral-100 text-neutral-600 ring-neutral-200 dark:bg-neutral-800 dark:text-neutral-300 dark:ring-neutral-700',
+};
+
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+    tone?: BadgeTone;
+}
+
+export function Badge({ className, tone = 'neutral', ...props }: BadgeProps) {
+    return (
+        <span
+            className={cn(
+                'inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium whitespace-nowrap ring-1 ring-inset',
+                toneClasses[tone],
+                className,
+            )}
+            {...props}
+        />
+    );
+}
