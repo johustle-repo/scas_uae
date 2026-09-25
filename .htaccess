@@ -1,0 +1,21 @@
+# Shared-hosting entry point (e.g. Hostinger Git deploy into public_html).
+#
+# The web server's document root is the project root, but Laravel must be
+# served from public/. Every request is sent into public/, so project files
+# such as .env, vendor/ and storage/ can never be requested directly.
+# Not used when the document root already points at public/.
+
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Fallback if mod_rewrite is unavailable: refuse everything rather than
+# exposing project files.
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>
