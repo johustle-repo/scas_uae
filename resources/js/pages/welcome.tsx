@@ -13,12 +13,18 @@ import {
     UsersIcon,
     type IconProps,
 } from '@/components/icons';
+import { store as storeApplication } from '@/actions/App/Http/Controllers/AdoptionApplicationController';
 import { AppLogo } from '@/components/app-logo';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Field } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
+import { Select } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { dashboard, login } from '@/routes';
 import type { User } from '@/types/auth';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Form, Head, Link, usePage } from '@inertiajs/react';
 import { type ComponentType, useState } from 'react';
 
 interface PublicDog {
@@ -584,73 +590,383 @@ function DogModal({
             size="lg"
         >
             {dog && (
-                <div className="grid gap-6 md:grid-cols-2">
-                    <DogPhoto dog={dog} className="aspect-square rounded-2xl" />
-                    <div>
-                        <DogFacts dog={dog} />
+                <DogModalContent
+                    key={dog.id}
+                    dog={dog}
+                    contact={contact}
+                    onClose={onClose}
+                />
+            )}
+        </Modal>
+    );
+}
 
-                        {dog.personality && (
-                            <p className="mt-4 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
-                                {dog.personality}
-                            </p>
-                        )}
+function DogModalContent({
+    dog,
+    contact,
+    onClose,
+}: {
+    dog: PublicDog;
+    contact: AdoptionContact;
+    onClose: () => void;
+}) {
+    const [view, setView] = useState<'details' | 'apply' | 'sent'>('details');
 
-                        <dl className="mt-5 space-y-3 text-sm">
-                            {dog.good_with.length > 0 && (
-                                <div>
-                                    <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                                        Gets along with
-                                    </dt>
-                                    <dd className="mt-1.5 flex flex-wrap gap-1.5">
-                                        {dog.good_with.map((item) => (
-                                            <span
-                                                key={item}
-                                                className="inline-flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-1 text-xs font-medium text-success-700 dark:bg-success-700/20 dark:text-success-500"
-                                            >
-                                                <CheckIcon className="size-3" />
-                                                {GOOD_WITH_LABELS[item]}
-                                            </span>
-                                        ))}
-                                    </dd>
-                                </div>
-                            )}
-                            {dog.energy_level && (
-                                <div className="flex items-center justify-between">
-                                    <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                                        Energy level
-                                    </dt>
-                                    <dd className="font-medium">
-                                        {dog.energy_level}
-                                    </dd>
-                                </div>
-                            )}
-                            {dog.house_trained && (
-                                <div className="flex items-center justify-between">
-                                    <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
-                                        House trained
-                                    </dt>
-                                    <dd className="font-medium">Yes</dd>
-                                </div>
-                            )}
-                        </dl>
+    if (view === 'apply') {
+        return (
+            <AdoptionForm
+                dog={dog}
+                onBack={() => setView('details')}
+                onSent={() => setView('sent')}
+            />
+        );
+    }
 
-                        <div className="mt-6 rounded-2xl bg-brand-50 p-4 dark:bg-brand-950/40">
-                            <p className="text-sm font-semibold text-brand-900 dark:text-brand-100">
-                                Interested in {dog.name}?
-                            </p>
-                            <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-                                Get in touch and we'll arrange a meet & greet.
+    if (view === 'sent') {
+        return (
+            <div className="flex flex-col items-center py-6 text-center">
+                <span className="flex size-16 items-center justify-center rounded-full bg-success-50 text-success-600 ring-8 ring-success-50/50 dark:bg-success-700/20 dark:text-success-500 dark:ring-success-700/10">
+                    <CheckIcon className="size-8" strokeWidth={2.5} />
+                </span>
+                <h3 className="mt-6 text-xl font-bold">
+                    Thank you for applying to adopt {dog.name}!
+                </h3>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+                    Our adoption team will review your request and contact you
+                    to arrange a meet & greet. Every application is read by a
+                    real person, so please allow a few days.
+                </p>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="mt-6 rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500"
+                >
+                    Keep browsing
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="grid gap-6 md:grid-cols-2">
+            <DogPhoto dog={dog} className="aspect-square rounded-2xl" />
+            <div>
+                <DogFacts dog={dog} />
+
+                {dog.personality && (
+                    <p className="mt-4 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+                        {dog.personality}
+                    </p>
+                )}
+
+                <dl className="mt-5 space-y-3 text-sm">
+                    {dog.good_with.length > 0 && (
+                        <div>
+                            <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                                Gets along with
+                            </dt>
+                            <dd className="mt-1.5 flex flex-wrap gap-1.5">
+                                {dog.good_with.map((item) => (
+                                    <span
+                                        key={item}
+                                        className="inline-flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-1 text-xs font-medium text-success-700 dark:bg-success-700/20 dark:text-success-500"
+                                    >
+                                        <CheckIcon className="size-3" />
+                                        {GOOD_WITH_LABELS[item]}
+                                    </span>
+                                ))}
+                            </dd>
+                        </div>
+                    )}
+                    {dog.energy_level && (
+                        <div className="flex items-center justify-between">
+                            <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                                Energy level
+                            </dt>
+                            <dd className="font-medium">{dog.energy_level}</dd>
+                        </div>
+                    )}
+                    {dog.house_trained && (
+                        <div className="flex items-center justify-between">
+                            <dt className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+                                House trained
+                            </dt>
+                            <dd className="font-medium">Yes</dd>
+                        </div>
+                    )}
+                </dl>
+
+                <div className="mt-6 rounded-2xl bg-brand-50 p-4 dark:bg-brand-950/40">
+                    <p className="text-sm font-semibold text-brand-900 dark:text-brand-100">
+                        Interested in {dog.name}?
+                    </p>
+                    <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                        Send an adoption request and we'll arrange a meet &
+                        greet.
+                    </p>
+                    <button
+                        type="button"
+                        onClick={() => setView('apply')}
+                        className="group mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-800/20 transition hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500"
+                    >
+                        <HeartIcon className="size-4" />
+                        Apply to adopt {dog.name}
+                        <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
+                    </button>
+                    {Object.keys(contact).length > 0 && (
+                        <>
+                            <p className="mt-3 text-center text-xs text-neutral-500 dark:text-neutral-400">
+                                or contact us directly
                             </p>
                             <ContactOptions
                                 contact={contact}
                                 dogName={dog.name}
-                                className="mt-3"
+                                className="mt-2 justify-center"
                             />
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+const HOME_TYPE_OPTIONS = [
+    { value: 'apartment', label: 'Apartment' },
+    { value: 'villa', label: 'Villa / house with garden' },
+    { value: 'townhouse', label: 'Townhouse' },
+    { value: 'other', label: 'Other' },
+];
+
+function AdoptionForm({
+    dog,
+    onBack,
+    onSent,
+}: {
+    dog: PublicDog;
+    onBack: () => void;
+    onSent: () => void;
+}) {
+    return (
+        <Form
+            action={storeApplication()}
+            options={{ preserveScroll: true, preserveState: true }}
+            onSuccess={onSent}
+            className="space-y-5"
+        >
+            {({ errors, processing }) => (
+                <>
+                    <div className="flex items-center gap-4 rounded-2xl bg-brand-50 p-3 dark:bg-brand-950/40">
+                        <DogPhoto
+                            dog={dog}
+                            className="size-14 shrink-0 rounded-xl"
+                        />
+                        <div className="min-w-0">
+                            <p className="text-sm font-semibold text-brand-900 dark:text-brand-100">
+                                Adoption request for {dog.name}
+                            </p>
+                            <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                                Takes about 2 minutes. Fields marked * are
+                                required.
+                            </p>
                         </div>
                     </div>
-                </div>
+
+                    <input type="hidden" name="dog_id" value={dog.id} />
+                    <div aria-hidden="true" className="absolute -left-[9999px]">
+                        <label htmlFor="website">Leave this empty</label>
+                        <input
+                            id="website"
+                            name="website"
+                            type="text"
+                            tabIndex={-1}
+                            autoComplete="off"
+                        />
+                    </div>
+
+                    {errors.dog_id && (
+                        <p
+                            role="alert"
+                            className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                        >
+                            {errors.dog_id}
+                        </p>
+                    )}
+
+                    <fieldset className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <legend className="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+                            About you
+                        </legend>
+                        <Field
+                            label="Full name *"
+                            htmlFor="full_name"
+                            error={errors.full_name}
+                        >
+                            <Input
+                                id="full_name"
+                                name="full_name"
+                                autoComplete="name"
+                                required
+                            />
+                        </Field>
+                        <Field
+                            label="Email *"
+                            htmlFor="email"
+                            error={errors.email}
+                        >
+                            <Input
+                                id="email"
+                                name="email"
+                                type="email"
+                                autoComplete="email"
+                                required
+                            />
+                        </Field>
+                        <Field
+                            label="Phone / WhatsApp *"
+                            htmlFor="phone"
+                            error={errors.phone}
+                        >
+                            <Input
+                                id="phone"
+                                name="phone"
+                                type="tel"
+                                autoComplete="tel"
+                                placeholder="+971 50 123 4567"
+                                required
+                            />
+                        </Field>
+                        <Field
+                            label="City / Emirate *"
+                            htmlFor="city"
+                            error={errors.city}
+                        >
+                            <Input
+                                id="city"
+                                name="city"
+                                autoComplete="address-level2"
+                                placeholder="e.g. Dubai"
+                                required
+                            />
+                        </Field>
+                    </fieldset>
+
+                    <fieldset className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <legend className="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase dark:text-neutral-400">
+                            Your home
+                        </legend>
+                        <Field
+                            label="Type of home *"
+                            htmlFor="home_type"
+                            error={errors.home_type}
+                        >
+                            <Select
+                                id="home_type"
+                                name="home_type"
+                                defaultValue=""
+                                required
+                            >
+                                <option value="" disabled>
+                                    Choose…
+                                </option>
+                                {HOME_TYPE_OPTIONS.map((option) => (
+                                    <option
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </Select>
+                        </Field>
+                        <div className="flex flex-col justify-end gap-2 pb-1">
+                            <label className="flex items-center gap-2 text-sm">
+                                <Checkbox name="has_garden" value="1" />
+                                We have a garden or outdoor space
+                            </label>
+                            <label className="flex items-center gap-2 text-sm">
+                                <Checkbox name="has_children" value="1" />
+                                There are children in our home
+                            </label>
+                        </div>
+                        <Field
+                            label="Other pets at home"
+                            htmlFor="other_pets"
+                            error={errors.other_pets}
+                            className="sm:col-span-2"
+                        >
+                            <Input
+                                id="other_pets"
+                                name="other_pets"
+                                placeholder="e.g. one cat, 4 years old"
+                            />
+                        </Field>
+                        <Field
+                            label="Experience with dogs"
+                            htmlFor="experience"
+                            error={errors.experience}
+                            className="sm:col-span-2"
+                        >
+                            <Input
+                                id="experience"
+                                name="experience"
+                                placeholder="e.g. grew up with dogs, first-time owner…"
+                            />
+                        </Field>
+                    </fieldset>
+
+                    <Field
+                        label={`Why would you like to adopt ${dog.name}? *`}
+                        htmlFor="message"
+                        error={errors.message}
+                    >
+                        <Textarea
+                            id="message"
+                            name="message"
+                            rows={4}
+                            placeholder="Tell us about your daily routine, who lives with you and what you're looking for in a dog."
+                            required
+                        />
+                    </Field>
+
+                    <div>
+                        <label className="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+                            <Checkbox
+                                name="agree"
+                                value="1"
+                                required
+                                className="mt-0.5"
+                            />
+                            I agree that SCAS may contact me about this adoption
+                            request and store my details for that purpose.
+                        </label>
+                        {errors.agree && (
+                            <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                {errors.agree}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="flex flex-col-reverse gap-2 border-t border-neutral-100 pt-4 sm:flex-row sm:justify-between dark:border-neutral-800">
+                        <button
+                            type="button"
+                            onClick={onBack}
+                            className="rounded-xl px-4 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                        >
+                            Back to {dog.name}
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-800/20 transition hover:bg-brand-800 disabled:opacity-60 dark:bg-brand-600 dark:hover:bg-brand-500"
+                        >
+                            <HeartIcon className="size-4" />
+                            {processing ? 'Sending…' : 'Send adoption request'}
+                        </button>
+                    </div>
+                </>
             )}
-        </Modal>
+        </Form>
     );
 }
 

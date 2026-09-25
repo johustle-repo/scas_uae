@@ -27,6 +27,7 @@ import { useAppearance } from '@/lib/appearance';
 import { useCan } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 import { dashboard, home } from '@/routes';
+import adoptionRequestsRoutes from '@/routes/adoption-requests';
 import dogsRoutes from '@/routes/dogs';
 import settingsRoutes from '@/routes/settings';
 import type { Auth, User } from '@/types/auth';
@@ -39,6 +40,8 @@ interface NavItem {
     href: string;
     icon: ComponentType<IconProps>;
     active: boolean;
+    /** Count shown as a notification pill, e.g. new adoption requests. */
+    badge?: number;
 }
 
 const statusNavItems: {
@@ -81,7 +84,10 @@ export function Sidebar({
     onToggle,
     variant = 'rail',
 }: SidebarProps) {
-    const { url, props } = usePage<{ auth: Auth }>();
+    const { url, props } = usePage<{
+        auth: Auth;
+        newAdoptionRequests: number;
+    }>();
     const can = useCan();
     const currentUrl = new URL(url, window.location.origin);
     const path = currentUrl.pathname;
@@ -122,6 +128,17 @@ export function Sidebar({
             icon: ArchiveIcon,
             active: isShowingArchived,
         },
+        ...(can('manage-placements')
+            ? [
+                  {
+                      label: 'Adoption Requests',
+                      href: adoptionRequestsRoutes.index.url(),
+                      icon: HeartIcon,
+                      active: path === '/adoption-requests',
+                      badge: props.newAdoptionRequests,
+                  },
+              ]
+            : []),
     ];
 
     const statusItems: NavItem[] = statusNavItems.map((item) => ({
@@ -364,7 +381,24 @@ function NavList({ items, open }: { items: NavItem[]; open: boolean }) {
                                     : 'text-brand-300/80 group-hover:text-brand-200',
                             )}
                         />
-                        {open && <span className="truncate">{item.label}</span>}
+                        {open && (
+                            <span className="flex-1 truncate">
+                                {item.label}
+                            </span>
+                        )}
+                        {item.badge !== undefined && item.badge > 0 && (
+                            <span
+                                className={cn(
+                                    'rounded-full bg-rose-500 text-[10px] leading-none font-bold text-white shadow-sm',
+                                    open
+                                        ? 'px-1.5 py-1'
+                                        : 'absolute top-0.5 right-1 size-2 p-0 text-transparent',
+                                )}
+                                aria-label={`${item.badge} new`}
+                            >
+                                {item.badge}
+                            </span>
+                        )}
                     </Link>
                 </li>
             ))}

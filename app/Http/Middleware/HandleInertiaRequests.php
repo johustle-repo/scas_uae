@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\AdoptionApplicationStatus;
 use App\Enums\Permission;
+use App\Models\AdoptionApplication;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -55,6 +57,9 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
             ],
             'sidebarOpen' => $request->cookie('sidebar_open', 'true') === 'true',
+            'newAdoptionRequests' => fn (): int => $user?->hasPermission(Permission::ManagePlacements)
+                ? AdoptionApplication::query()->where('status', AdoptionApplicationStatus::New)->count()
+                : 0,
         ];
     }
 }
