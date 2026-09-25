@@ -1,8 +1,15 @@
 # Shared-hosting entry point (e.g. Hostinger Git deploy into public_html).
 #
 # The web server's document root is the project root, but Laravel must be
-# served from public/. Every request is sent into public/, so project files
-# such as .env, vendor/ and storage/ can never be requested directly.
+# served from public/. Existing files in public/ (built assets, favicon,
+# images) are served directly; every other request goes to public/index.php.
+# Project files such as .env, vendor/ and storage/ are never reachable.
+#
+# The file check is done here rather than left to public/.htaccess because
+# LiteSpeed (used by Hostinger) evaluates REQUEST_FILENAME against the
+# original path after an internal rewrite, so real asset files would
+# otherwise be handed to Laravel and return 404.
+#
 # Not used when the document root already points at public/.
 
 Options -Indexes
@@ -10,8 +17,20 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Pass the Authorization and X-XSRF-Token headers through to PHP.
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Serve files that exist in public/ directly.
     RewriteCond %{REQUEST_URI} !^/public/
+    RewriteCond %{DOCUMENT_ROOT}/public%{REQUEST_URI} -f
     RewriteRule ^(.*)$ public/$1 [L]
+
+    # Everything else is handled by Laravel.
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^ public/index.php [L]
 </IfModule>
 
 # Fallback if mod_rewrite is unavailable: refuse everything rather than
