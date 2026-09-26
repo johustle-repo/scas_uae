@@ -42,7 +42,7 @@ if [ ! -f .env ]; then
 fi
 
 if [ ! -f public/build/manifest.json ]; then
-    echo "Warning: public/build is missing. Run 'npm run build' locally and upload public/build." >&2
+    echo "Warning: public/build is missing. Run 'npm run build' locally, commit public/build and push." >&2
 fi
 
 "$PHP_BIN" "$COMPOSER_BIN" install --no-dev --optimize-autoloader --no-interaction
