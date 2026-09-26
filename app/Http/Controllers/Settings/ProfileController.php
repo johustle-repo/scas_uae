@@ -67,21 +67,20 @@ class ProfileController extends Controller
             return [];
         }
 
-        return DB::table(config('session.table', 'sessions'))
+        return array_values(DB::table(config('session.table', 'sessions'))
             ->where('user_id', $request->user()->getAuthIdentifier())
             ->orderByDesc('last_activity')
             ->get(['id', 'ip_address', 'user_agent', 'last_activity'])
             ->map(fn (object $session): array => [
                 'id' => hash('sha256', $session->id),
-                'ip_address' => $session->ip_address,
+                'ip_address' => is_string($session->ip_address) ? $session->ip_address : null,
                 'browser' => $this->browser((string) $session->user_agent),
                 'platform' => $this->platform((string) $session->user_agent),
                 'is_mobile' => (bool) preg_match('/Mobile|Android|iPhone|iPad/i', (string) $session->user_agent),
                 'is_current' => $session->id === $request->session()->getId(),
                 'last_active_at' => CarbonImmutable::createFromTimestamp($session->last_activity)->toIso8601String(),
             ])
-            ->values()
-            ->all();
+            ->all());
     }
 
     private function browser(string $userAgent): string

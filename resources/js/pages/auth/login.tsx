@@ -65,7 +65,7 @@ export default function Login() {
                 <aside className="relative hidden w-[46%] flex-col justify-between overflow-hidden bg-linear-to-br from-brand-700 via-brand-900 to-brand-950 p-12 text-white lg:flex">
                     <div
                         aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:22px_22px]"
+                        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:22px_22px] opacity-[0.08]"
                     />
                     <div
                         aria-hidden="true"
@@ -158,7 +158,7 @@ export default function Login() {
                     />
                     <div
                         aria-hidden="true"
-                        className="pointer-events-none absolute inset-0 opacity-70 [background-image:linear-gradient(to_right,var(--color-brand-200)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-brand-200)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_10%,transparent_65%)] dark:opacity-10"
+                        className="pointer-events-none absolute inset-0 [background-image:linear-gradient(to_right,var(--color-brand-200)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-brand-200)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_at_center,black_10%,transparent_65%)] [background-size:48px_48px] opacity-70 dark:opacity-10"
                     />
                     <div
                         aria-hidden="true"

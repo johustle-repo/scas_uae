@@ -79,7 +79,7 @@ class DemoDogSeeder extends Seeder
             });
         });
 
-        $this->command?->info(count(self::DOGS).' demo dogs seeded (SCAS IDs '.self::ID_PREFIX.'001–'.sprintf('%03d', count(self::DOGS)).').');
+        $this->command->info(count(self::DOGS).' demo dogs seeded (SCAS IDs '.self::ID_PREFIX.'001–'.sprintf('%03d', count(self::DOGS)).').');
     }
 
     /**

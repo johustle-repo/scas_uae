@@ -126,7 +126,12 @@
 
     * {
         scrollbar-width: thin;
-        scrollbar-color: color-mix(in oklch, var(--color-brand-400) 45%, transparent) transparent;
+        scrollbar-color: color-mix(
+                in oklch,
+                var(--color-brand-400) 45%,
+                transparent
+            )
+            transparent;
     }
 
     ::selection {

@@ -5,13 +5,13 @@ namespace App\Models;
 use App\Enums\AdoptionApplicationStatus;
 use App\Enums\HomeType;
 use App\Models\Concerns\Auditable;
+use Carbon\CarbonImmutable;
 use Database\Factories\AdoptionApplicationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Carbon;
 
 /**
  * An adoption request submitted by a member of the public from the landing page.
@@ -31,10 +31,10 @@ use Illuminate\Support\Carbon;
  * @property AdoptionApplicationStatus $status
  * @property string|null $staff_notes
  * @property int|null $reviewed_by
- * @property Carbon|null $reviewed_at
+ * @property CarbonImmutable|null $reviewed_at
  * @property string|null $ip_address
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonImmutable|null $created_at
+ * @property CarbonImmutable|null $updated_at
  */
 #[Fillable([
     'dog_id',

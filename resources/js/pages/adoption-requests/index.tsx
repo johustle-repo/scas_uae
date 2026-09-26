@@ -414,7 +414,8 @@ function RequestDetails({
                                 <CheckIcon className="size-3.5" />
                                 Status last changed by {
                                     request.reviewer
-                                } on {formatDateTime(request.reviewed_at)}
+                                } on{' '}
+                                {formatDateTime(request.reviewed_at)}
                             </p>
                         )}
                         <div className="flex justify-end gap-2">

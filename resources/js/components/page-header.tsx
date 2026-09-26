@@ -29,7 +29,7 @@ export function PageHeader({
         <div className="relative mb-6 overflow-hidden rounded-2xl border border-brand-100 bg-linear-to-br from-brand-50 via-white to-brand-100/60 p-5 shadow-sm shadow-brand-900/5 dark:border-brand-900/40 dark:from-brand-950/70 dark:via-neutral-900 dark:to-brand-950/40 dark:shadow-none">
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle,var(--color-brand-200)_1px,transparent_1px)] [background-size:18px_18px] opacity-60 [mask-image:linear-gradient(to_left,black,transparent_70%)] dark:opacity-15"
+                className="pointer-events-none absolute inset-0 [background-image:radial-gradient(circle,var(--color-brand-200)_1px,transparent_1px)] [mask-image:linear-gradient(to_left,black,transparent_70%)] [background-size:18px_18px] opacity-60 dark:opacity-15"
             />
             <div
                 aria-hidden="true"

@@ -58,7 +58,7 @@ class DogProfilePhotoSeeder extends Seeder
         $dogs = Dog::query()->whereNull('photo_path')->orderBy('id')->get();
 
         if ($dogs->isEmpty()) {
-            $this->command?->info('Every dog already has a profile photo.');
+            $this->command->info('Every dog already has a profile photo.');
 
             return;
         }
@@ -73,7 +73,7 @@ class DogProfilePhotoSeeder extends Seeder
             }
         });
 
-        $this->command?->info("Seeded placeholder profile photos for {$seeded} of {$dogs->count()} dogs.");
+        $this->command->info("Seeded placeholder profile photos for {$seeded} of {$dogs->count()} dogs.");
     }
 
     private function seedPhoto(Dog $dog): bool
@@ -81,7 +81,7 @@ class DogProfilePhotoSeeder extends Seeder
         $imageUrl = $this->nextImageUrl($this->breedPathFor($dog->breed));
 
         if ($imageUrl === null) {
-            $this->command?->warn("No image available for {$dog->name}; skipped.");
+            $this->command->warn("No image available for {$dog->name}; skipped.");
 
             return false;
         }
@@ -89,13 +89,13 @@ class DogProfilePhotoSeeder extends Seeder
         try {
             $response = Http::timeout(20)->retry(2, 500)->get($imageUrl);
         } catch (Throwable $exception) {
-            $this->command?->warn("Could not download a photo for {$dog->name}: {$exception->getMessage()}");
+            $this->command->warn("Could not download a photo for {$dog->name}: {$exception->getMessage()}");
 
             return false;
         }
 
         if (! $response->successful() || ! str_starts_with((string) $response->header('Content-Type'), 'image/')) {
-            $this->command?->warn("Could not download a photo for {$dog->name}; skipped.");
+            $this->command->warn("Could not download a photo for {$dog->name}; skipped.");
 
             return false;
         }

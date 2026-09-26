@@ -108,14 +108,14 @@ export function AuthenticatedLayout({ children }: { children: ReactNode }) {
                 </div>
             </div>
 
-            <main className="relative isolate min-w-0 flex-1 overflow-y-auto bg-canvas [scrollbar-gutter:stable] dark:bg-neutral-950">
+            <main className="relative isolate min-w-0 flex-1 [scrollbar-gutter:stable] overflow-y-auto bg-canvas dark:bg-neutral-950">
                 <div
                     aria-hidden="true"
                     className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-80 bg-linear-to-b from-brand-100/70 to-transparent dark:from-brand-950/50"
                 />
                 <div
                     aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 [background-image:radial-gradient(circle,var(--color-brand-200)_1px,transparent_1px)] [background-size:22px_22px] opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent)] dark:opacity-10"
+                    className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-96 [background-image:radial-gradient(circle,var(--color-brand-200)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,black,transparent)] [background-size:22px_22px] opacity-50 dark:opacity-10"
                 />
                 <div
                     aria-hidden="true"

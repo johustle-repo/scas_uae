@@ -174,7 +174,7 @@ export function Sidebar({
     return (
         <aside
             className={cn(
-                'relative flex h-full shrink-0 flex-col overflow-hidden bg-linear-to-b from-brand-900 to-brand-950 text-brand-50 dark:from-brand-950 dark:to-neutral-950 dark:border-r dark:border-white/5',
+                'relative flex h-full shrink-0 flex-col overflow-hidden bg-linear-to-b from-brand-900 to-brand-950 text-brand-50 dark:border-r dark:border-white/5 dark:from-brand-950 dark:to-neutral-950',
                 variant === 'rail' && 'transition-[width] duration-200',
                 open ? (variant === 'rail' ? 'w-64' : 'w-72') : 'w-16',
             )}
