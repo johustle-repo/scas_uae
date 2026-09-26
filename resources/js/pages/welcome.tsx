@@ -509,6 +509,14 @@ export default function Welcome({
                             © {new Date().getFullYear()} Second Chance Animal
                             Sanctuary · United Arab Emirates
                         </span>
+                        <span className="text-center">
+                            Powered by:{' '}
+                            <span className="font-medium">EBNLeadGen</span> ·
+                            Developed by:{' '}
+                            <span className="font-medium">
+                                Elmar Noche &amp; Jonathan Quiles
+                            </span>
+                        </span>
                         <Link
                             href={auth.user ? dashboard.url() : login.url()}
                             className="font-medium hover:text-brand-700 dark:hover:text-brand-300"
