@@ -50,6 +50,7 @@ import {
     useRef,
     useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 
 interface DogsIndexProps {
     dogs: Paginated<Dog>;
@@ -340,20 +341,63 @@ DogsIndex.layout = (page: ReactElement) => (
  * an Excel workbook or a PDF report.
  */
 function ExportMenu() {
-    const menuRef = useRef<HTMLDetailsElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const [position, setPosition] = useState<{
+        top: number;
+        right: number;
+    } | null>(null);
+
+    const close = () => setPosition(null);
+
+    const toggle = () => {
+        const rect = buttonRef.current?.getBoundingClientRect();
+
+        setPosition(
+            position || !rect
+                ? null
+                : {
+                      top: rect.bottom + 4,
+                      right: window.innerWidth - rect.right,
+                  },
+        );
+    };
 
     useEffect(() => {
+        if (!position) {
+            return;
+        }
+
         const closeOnOutsideClick = (event: MouseEvent) => {
-            if (!menuRef.current?.contains(event.target as Node)) {
-                menuRef.current?.removeAttribute('open');
+            const target = event.target as Node;
+
+            if (
+                !menuRef.current?.contains(target) &&
+                !buttonRef.current?.contains(target)
+            ) {
+                setPosition(null);
             }
         };
+        const closeOnEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setPosition(null);
+                buttonRef.current?.focus();
+            }
+        };
+        const closeMenu = () => setPosition(null);
 
         document.addEventListener('mousedown', closeOnOutsideClick);
+        document.addEventListener('keydown', closeOnEscape);
+        window.addEventListener('scroll', closeMenu, true);
+        window.addEventListener('resize', closeMenu);
 
-        return () =>
+        return () => {
             document.removeEventListener('mousedown', closeOnOutsideClick);
-    }, []);
+            document.removeEventListener('keydown', closeOnEscape);
+            window.removeEventListener('scroll', closeMenu, true);
+            window.removeEventListener('resize', closeMenu);
+        };
+    }, [position]);
 
     const options = [
         { format: 'excel', label: 'Excel (.xlsx)' },
@@ -361,30 +405,44 @@ function ExportMenu() {
     ] as const;
 
     return (
-        <details ref={menuRef} className="relative">
-            <summary
-                className={cn(
-                    buttonClasses('secondary', 'sm'),
-                    'w-full cursor-pointer list-none [&::-webkit-details-marker]:hidden',
-                )}
+        <>
+            <button
+                ref={buttonRef}
+                type="button"
+                onClick={toggle}
+                aria-haspopup="menu"
+                aria-expanded={position !== null}
+                className={cn(buttonClasses('secondary', 'sm'), 'w-full')}
             >
                 <DownloadIcon className="size-3.5" />
                 Export Data
                 <ChevronDownIcon className="size-3" />
-            </summary>
-            <div className="absolute right-0 z-20 mt-1 w-40 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
-                {options.map((option) => (
-                    <a
-                        key={option.format}
-                        href={dogsRoutes.export.url({ format: option.format })}
-                        download
-                        onClick={() => menuRef.current?.removeAttribute('open')}
-                        className="block px-3 py-1.5 text-xs text-neutral-700 hover:bg-brand-50 hover:text-brand-800 dark:text-neutral-200 dark:hover:bg-brand-950 dark:hover:text-brand-200"
+            </button>
+            {position &&
+                createPortal(
+                    <div
+                        ref={menuRef}
+                        role="menu"
+                        style={{ top: position.top, right: position.right }}
+                        className="fixed z-50 w-40 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
                     >
-                        {option.label}
-                    </a>
-                ))}
-            </div>
-        </details>
+                        {options.map((option) => (
+                            <a
+                                key={option.format}
+                                role="menuitem"
+                                href={dogsRoutes.export.url({
+                                    format: option.format,
+                                })}
+                                download
+                                onClick={close}
+                                className="block px-3 py-1.5 text-xs text-neutral-700 hover:bg-brand-50 hover:text-brand-800 focus:bg-brand-50 focus:outline-none dark:text-neutral-200 dark:hover:bg-brand-950 dark:hover:text-brand-200 dark:focus:bg-brand-950"
+                            >
+                                {option.label}
+                            </a>
+                        ))}
+                    </div>,
+                    document.body,
+                )}
+        </>
     );
 }
