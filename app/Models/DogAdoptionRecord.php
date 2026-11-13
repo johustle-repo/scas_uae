@@ -51,8 +51,8 @@ class DogAdoptionRecord extends Model
     {
         return [
             'adoption_type' => PlacementType::class,
-            'adoption_date' => 'date',
-            'return_date' => 'date',
+            'adoption_date' => 'date:Y-m-d',
+            'return_date' => 'date:Y-m-d',
         ];
     }
 

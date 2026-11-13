@@ -90,9 +90,19 @@ class DogStoreRequest extends FormRequest
             'medical.treatment_required' => ['nullable', 'string'],
 
             // Identification
-            'identification.microchip_number' => ['nullable', 'string', 'max:255'],
+            'identification.microchip_number' => ['nullable', 'string', 'max:255', Rule::unique('dog_identifications', 'microchip_number')],
             'identification.microchip_date' => ['nullable', 'date'],
             'identification.microchip_location' => ['nullable', 'string', 'max:255'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'identification.microchip_number.unique' => 'This microchip number is already registered to another dog.',
         ];
     }
 }

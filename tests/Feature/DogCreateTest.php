@@ -140,3 +140,19 @@ test('a photo path cannot be set directly through the form', function () {
 
     expect(Dog::sole()->photo_path)->toBeNull();
 });
+
+test('a microchip number already registered to another dog is rejected', function () {
+    $user = User::factory()->create();
+    DogIdentification::factory()->create(['microchip_number' => '900200000000001']);
+
+    $this->actingAs($user)->post(route('dogs.store'), [
+        'name' => 'Max',
+        'species' => 'canine',
+        'breed' => 'Labrador',
+        'gender' => 'male',
+        'size' => 'large',
+        'identification' => ['microchip_number' => '900200000000001'],
+    ])->assertSessionHasErrors('identification.microchip_number');
+
+    expect(Dog::count())->toBe(1);
+});

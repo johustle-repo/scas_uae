@@ -455,6 +455,11 @@ export default function DogCreate({
                                 <Field
                                     label="Microchip Number"
                                     htmlFor="identification.microchip_number"
+                                    error={
+                                        errors[
+                                            'identification.microchip_number'
+                                        ]
+                                    }
                                 >
                                     <Input
                                         id="identification.microchip_number"

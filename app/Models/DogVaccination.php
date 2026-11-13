@@ -43,8 +43,8 @@ class DogVaccination extends Model
     protected function casts(): array
     {
         return [
-            'administered_date' => 'date',
-            'next_due_date' => 'date',
+            'administered_date' => 'date:Y-m-d',
+            'next_due_date' => 'date:Y-m-d',
         ];
     }
 

@@ -3,6 +3,7 @@
 use App\Enums\DogStatus;
 use App\Models\Dog;
 use App\Models\DogFosterRecord;
+use App\Models\DogIdentification;
 use App\Models\DogVaccination;
 use App\Models\User;
 
@@ -105,4 +106,26 @@ test('recording a return on an adoption marks the dog for rehoming', function ()
     ]);
 
     expect($dog->fresh()->current_status)->toBe(DogStatus::ReturnedRehoming);
+});
+
+test('the edit form receives the date of birth in a format the date input accepts', function () {
+    $user = User::factory()->create();
+    $dog = Dog::factory()->create(['date_of_birth' => '2021-05-14']);
+
+    $this->actingAs($user)->get(route('dogs.edit', $dog))
+        ->assertInertia(fn ($page) => $page->where('dog.date_of_birth', '2021-05-14'));
+});
+
+test('a dog can keep its own microchip number but not use one registered to another dog', function () {
+    $user = User::factory()->create();
+    $identification = DogIdentification::factory()->create(['microchip_number' => '900200000000001']);
+    DogIdentification::factory()->create(['microchip_number' => '900200000000002']);
+
+    $this->actingAs($user)
+        ->patch(route('dogs.identification.update', $identification->dog_id), ['microchip_number' => '900200000000001'])
+        ->assertSessionHasNoErrors();
+
+    $this->actingAs($user)
+        ->patch(route('dogs.identification.update', $identification->dog_id), ['microchip_number' => '900200000000002'])
+        ->assertSessionHasErrors('microchip_number');
 });

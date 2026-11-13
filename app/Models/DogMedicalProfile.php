@@ -51,8 +51,8 @@ class DogMedicalProfile extends Model
     {
         return [
             'spayed_neutered' => 'boolean',
-            'spayed_neutered_date' => 'date',
-            'last_vet_check_date' => 'date',
+            'spayed_neutered_date' => 'date:Y-m-d',
+            'last_vet_check_date' => 'date:Y-m-d',
         ];
     }
 

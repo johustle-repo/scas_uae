@@ -24,7 +24,12 @@ class IdentificationUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'microchip_number' => ['nullable', 'string', 'max:255'],
+            'microchip_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('dog_identifications', 'microchip_number')->ignore($this->route('dog')?->getKey(), 'dog_id'),
+            ],
             'microchip_date' => ['nullable', 'date'],
             'microchip_location' => ['nullable', 'string', 'max:255'],
             'microchip_registration_status' => ['nullable', Rule::enum(RegistrationStatus::class)],
@@ -37,6 +42,16 @@ class IdentificationUpdateRequest extends FormRequest
             'pcc_registration_date' => ['nullable', 'date'],
             'pcc_registration_status' => ['nullable', Rule::enum(RegistrationStatus::class)],
             'supporting_documents_notes' => ['nullable', 'string'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'microchip_number.unique' => 'This microchip number is already registered to another dog.',
         ];
     }
 }

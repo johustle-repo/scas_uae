@@ -59,12 +59,12 @@ class DogIdentification extends Model
     protected function casts(): array
     {
         return [
-            'microchip_date' => 'date',
+            'microchip_date' => 'date:Y-m-d',
             'microchip_registration_status' => RegistrationStatus::class,
-            'passport_issue_date' => 'date',
-            'passport_expiry_date' => 'date',
+            'passport_issue_date' => 'date:Y-m-d',
+            'passport_expiry_date' => 'date:Y-m-d',
             'passport_status' => RegistrationStatus::class,
-            'pcc_registration_date' => 'date',
+            'pcc_registration_date' => 'date:Y-m-d',
             'pcc_registration_status' => RegistrationStatus::class,
         ];
     }

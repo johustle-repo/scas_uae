@@ -113,7 +113,7 @@ class Dog extends Model
             'species' => Species::class,
             'gender' => Gender::class,
             'size' => Size::class,
-            'date_of_birth' => 'date',
+            'date_of_birth' => 'date:Y-m-d',
             'date_of_birth_is_approximate' => 'boolean',
             'current_status' => DogStatus::class,
             'energy_level' => EnergyLevel::class,

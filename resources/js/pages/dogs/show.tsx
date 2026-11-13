@@ -1024,18 +1024,19 @@ function IdentificationTab({ dog, editing, onDone }: EditableTabProps) {
             <SectionTitle>Identification Details</SectionTitle>
             {editing ? (
                 <Form action={updateIdentification(dog.id)} onSuccess={onDone}>
-                    {({ processing }) => (
+                    {({ errors, processing }) => (
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            <div>
-                                <Label htmlFor="microchip_number">
-                                    Microchip Number
-                                </Label>
+                            <Field
+                                label="Microchip Number"
+                                htmlFor="microchip_number"
+                                error={errors.microchip_number}
+                            >
                                 <Input
                                     id="microchip_number"
                                     name="microchip_number"
                                     defaultValue={id?.microchip_number ?? ''}
                                 />
-                            </div>
+                            </Field>
                             <div>
                                 <Label htmlFor="microchip_date">
                                     Date of Microchipping

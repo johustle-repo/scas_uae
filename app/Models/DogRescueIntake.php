@@ -50,8 +50,8 @@ class DogRescueIntake extends Model
     protected function casts(): array
     {
         return [
-            'date_received' => 'date',
-            'intake_date' => 'date',
+            'date_received' => 'date:Y-m-d',
+            'intake_date' => 'date:Y-m-d',
         ];
     }
 

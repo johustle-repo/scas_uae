@@ -229,10 +229,11 @@ export default function Welcome({
                                 </span>
                             </h1>
                             <p className="mt-6 max-w-xl text-base leading-relaxed text-brand-100/85 sm:text-lg">
-                                Our rescues were found on streets, farms and in
-                                the desert across the UAE. Today they are safe,
-                                cared for — and ready to meet the family who
-                                will love them for life.
+                                We are a non-profit animal rescue sanctuary
+                                dedicated to rescuing abandoned and vulnerable
+                                dogs across the UAE. We provide them with
+                                safety, veterinary care, rehabilitation, and a
+                                second chance at finding a loving forever home.
                             </p>
                             <div className="mt-10 flex flex-wrap items-center gap-4">
                                 <a
