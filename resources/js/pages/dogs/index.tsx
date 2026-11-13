@@ -43,7 +43,13 @@ import {
     type Paginated,
 } from '@/types/dog';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { type FormEvent, type ReactElement, useState } from 'react';
+import {
+    type FormEvent,
+    type ReactElement,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 
 interface DogsIndexProps {
     dogs: Paginated<Dog>;
@@ -132,14 +138,7 @@ export default function DogsIndex({
                                 <PlusIcon className="size-3.5" />
                                 Add New Dog
                             </Link>
-                            <a
-                                href={dogsRoutes.export.url()}
-                                className={buttonClasses('secondary', 'sm')}
-                                download
-                            >
-                                <DownloadIcon className="size-3.5" />
-                                Export Data
-                            </a>
+                            <ExportMenu />
                         </div>
                     )
                 }
@@ -335,3 +334,57 @@ export default function DogsIndex({
 DogsIndex.layout = (page: ReactElement) => (
     <AuthenticatedLayout>{page}</AuthenticatedLayout>
 );
+
+/**
+ * "Export Data" button that opens a menu to download every dog record as
+ * an Excel workbook or a PDF report.
+ */
+function ExportMenu() {
+    const menuRef = useRef<HTMLDetailsElement>(null);
+
+    useEffect(() => {
+        const closeOnOutsideClick = (event: MouseEvent) => {
+            if (!menuRef.current?.contains(event.target as Node)) {
+                menuRef.current?.removeAttribute('open');
+            }
+        };
+
+        document.addEventListener('mousedown', closeOnOutsideClick);
+
+        return () =>
+            document.removeEventListener('mousedown', closeOnOutsideClick);
+    }, []);
+
+    const options = [
+        { format: 'excel', label: 'Excel (.xlsx)' },
+        { format: 'pdf', label: 'PDF (.pdf)' },
+    ] as const;
+
+    return (
+        <details ref={menuRef} className="relative">
+            <summary
+                className={cn(
+                    buttonClasses('secondary', 'sm'),
+                    'w-full cursor-pointer list-none [&::-webkit-details-marker]:hidden',
+                )}
+            >
+                <DownloadIcon className="size-3.5" />
+                Export Data
+                <ChevronDownIcon className="size-3" />
+            </summary>
+            <div className="absolute right-0 z-20 mt-1 w-40 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+                {options.map((option) => (
+                    <a
+                        key={option.format}
+                        href={dogsRoutes.export.url({ format: option.format })}
+                        download
+                        onClick={() => menuRef.current?.removeAttribute('open')}
+                        className="block px-3 py-1.5 text-xs text-neutral-700 hover:bg-brand-50 hover:text-brand-800 dark:text-neutral-200 dark:hover:bg-brand-950 dark:hover:text-brand-200"
+                    >
+                        {option.label}
+                    </a>
+                ))}
+            </div>
+        </details>
+    );
+}

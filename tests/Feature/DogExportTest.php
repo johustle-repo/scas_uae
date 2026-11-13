@@ -6,6 +6,7 @@ use App\Models\Dog;
 use App\Models\DogIdentification;
 use App\Models\DogVaccination;
 use App\Models\User;
+use App\Support\DogDataExport;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
@@ -14,7 +15,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
  */
 function downloadDogExport(User $user): Spreadsheet
 {
-    $response = test()->actingAs($user)->get(route('dogs.export'));
+    $response = test()->actingAs($user)->get(route('dogs.export', 'excel'));
 
     $response->assertOk();
     $response->assertDownload('scas-dogs-'.now()->format('Y-m-d').'.xlsx');
@@ -29,7 +30,7 @@ function downloadDogExport(User $user): Spreadsheet
     }
 }
 
-test('all dog data can be exported as a workbook', function () {
+test('all dog data can be exported as an excel workbook', function () {
     $user = User::factory()->create();
     $dog = Dog::factory()->create(['name' => 'Abby', 'date_of_birth' => '2025-01-10']);
     DogIdentification::factory()->for($dog)->create(['microchip_number' => '900200000000001']);
@@ -59,12 +60,45 @@ test('all dog data can be exported as a workbook', function () {
     expect(AuditLog::where('action', 'export.dogs')->count())->toBe(1);
 });
 
-test('users who cannot manage dogs cannot export data', function () {
-    $user = User::factory()->role(UserRole::MedicalStaff)->create();
+test('all dog data can be exported as a pdf report', function () {
+    $user = User::factory()->create();
+    Dog::factory()->create(['name' => 'Abby']);
 
-    $this->actingAs($user)->get(route('dogs.export'))->assertForbidden();
+    $response = $this->actingAs($user)->get(route('dogs.export', 'pdf'));
+
+    $response->assertOk();
+    $response->assertDownload('scas-dogs-'.now()->format('Y-m-d').'.pdf');
+    expect($response->streamedContent())->toStartWith('%PDF');
+    expect(AuditLog::where('action', 'export.dogs')->sole()->description)->toContain('PDF');
 });
 
+test('each pdf profile only lists the records of its own dog', function () {
+    $abby = Dog::factory()->create(['name' => 'Abby']);
+    DogVaccination::factory()->for($abby)->create(['vaccine_details' => 'Rabies']);
+    Dog::factory()->create(['name' => 'Goldie']);
+
+    $profiles = collect(app(DogDataExport::class)->profiles())->keyBy('details.Name');
+    $abbyTreatments = $profiles['Abby']['related']['Treatments & Vaccinations'];
+
+    expect($profiles)->toHaveCount(2)
+        ->and($profiles['Abby']['details']['SCAS ID'])->toBe($abby->scas_id)
+        ->and($abbyTreatments['rows'])->toHaveCount(1)
+        ->and($abbyTreatments['rows'][0][array_search('Vaccine Details', $abbyTreatments['headings'])])->toBe('Rabies')
+        ->and($profiles['Goldie']['related'])->toBe([]);
+});
+
+test('an unsupported export format is not found', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get('/dogs/export/csv')->assertNotFound();
+});
+
+test('users who cannot manage dogs cannot export data', function (string $format) {
+    $user = User::factory()->role(UserRole::MedicalStaff)->create();
+
+    $this->actingAs($user)->get(route('dogs.export', $format))->assertForbidden();
+})->with(['excel', 'pdf']);
+
 test('guests cannot export data', function () {
-    $this->get(route('dogs.export'))->assertRedirect(route('login'));
+    $this->get(route('dogs.export', 'excel'))->assertRedirect(route('login'));
 });

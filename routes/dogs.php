@@ -18,7 +18,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('can:manage-dogs')->group(function (): void {
         Route::get('dogs/create', [DogController::class, 'create'])->name('dogs.create');
-        Route::get('dogs/export', ExportController::class)->name('dogs.export');
+        Route::get('dogs/export/{format}', ExportController::class)->whereIn('format', ['excel', 'pdf'])->name('dogs.export');
         Route::post('dogs', [DogController::class, 'store'])->name('dogs.store');
         Route::get('dogs/{dog}/edit', [DogController::class, 'edit'])->name('dogs.edit');
         Route::put('dogs/{dog}', [DogController::class, 'update'])->name('dogs.update');
