@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Dogs;
 
 use App\Enums\RegistrationStatus;
+use App\Models\Dog;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -23,12 +24,14 @@ class IdentificationUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $dog = $this->route('dog');
+
         return [
             'microchip_number' => [
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('dog_identifications', 'microchip_number')->ignore($this->route('dog')?->getKey(), 'dog_id'),
+                Rule::unique('dog_identifications', 'microchip_number')->ignore($dog instanceof Dog ? $dog->getKey() : null, 'dog_id'),
             ],
             'microchip_date' => ['nullable', 'date'],
             'microchip_location' => ['nullable', 'string', 'max:255'],

@@ -79,15 +79,15 @@ class DogDataExport
     {
         $tables = $this->tables();
         $dogTable = $tables['Dogs'];
-        $scasIdColumn = array_search('SCAS ID', $dogTable['headings'], true);
 
-        return array_map(function (array $row) use ($dogTable, $scasIdColumn, $tables): array {
+        return array_map(function (array $row) use ($dogTable, $tables): array {
+            $details = array_combine($dogTable['headings'], $row);
             $related = [];
 
             foreach (self::RELATED_TABLES as $title) {
                 $relatedRows = array_values(array_filter(
                     $tables[$title]['rows'],
-                    fn (array $relatedRow): bool => $relatedRow[0] === $row[$scasIdColumn],
+                    fn (array $relatedRow): bool => $relatedRow[0] === $details['SCAS ID'],
                 ));
 
                 if ($relatedRows !== []) {
@@ -100,7 +100,7 @@ class DogDataExport
 
             return [
                 'details' => array_filter(
-                    array_combine($dogTable['headings'], $row),
+                    $details,
                     fn (mixed $value): bool => $value !== null && $value !== '',
                 ),
                 'related' => $related,
@@ -152,7 +152,9 @@ class DogDataExport
             }
         }
 
-        $rows = $dogs->map(function (Dog $dog) use ($columns): array {
+        $rows = [];
+
+        foreach ($dogs as $dog) {
             $row = array_map(function (array $column) use ($dog): mixed {
                 [$relation, $attribute] = $column;
                 $record = $relation === '' ? $dog : $dog->getRelation($relation);
@@ -161,9 +163,8 @@ class DogDataExport
             }, $columns);
 
             $row[] = $dog->archived_at === null ? 'No' : 'Yes';
-
-            return $row;
-        })->all();
+            $rows[] = $row;
+        }
 
         return [
             'headings' => [...array_map(fn (array $column): string => $this->heading($column[1]), $columns), 'Archived'],
@@ -183,14 +184,23 @@ class DogDataExport
         $related = (new Dog)->{$relation}()->getRelated();
         $attributes = array_values(array_diff($related->getFillable(), self::EXCLUDED_ATTRIBUTES));
 
-        $rows = $dogs->flatMap(fn (Dog $dog): array => $dog->getRelation($relation)
-            ->map(fn (Model $record): array => [
-                $dog->scas_id,
-                $dog->name,
-                ...array_map(fn (string $attribute): mixed => $this->formatValue($record->getAttribute($attribute)), $attributes),
-            ])
-            ->all()
-        )->all();
+        $rows = [];
+
+        foreach ($dogs as $dog) {
+            $records = $dog->getRelation($relation);
+
+            if (! $records instanceof Collection) {
+                continue;
+            }
+
+            foreach ($records as $record) {
+                $rows[] = [
+                    $dog->scas_id,
+                    $dog->name,
+                    ...array_map(fn (string $attribute): mixed => $this->formatValue($record->getAttribute($attribute)), $attributes),
+                ];
+            }
+        }
 
         return [
             'headings' => ['SCAS ID', 'Dog Name', ...array_map($this->heading(...), $attributes)],
