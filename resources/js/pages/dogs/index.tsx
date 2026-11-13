@@ -12,6 +12,7 @@ import {
     ArchiveIcon,
     ChevronDownIcon,
     CloseIcon,
+    DownloadIcon,
     PawIcon,
     PlusIcon,
     ResetIcon,
@@ -123,13 +124,23 @@ export default function DogsIndex({
                 }
                 actions={
                     can('manage-dogs') && (
-                        <Link
-                            href={dogsRoutes.create.url()}
-                            className={buttonClasses('primary', 'sm')}
-                        >
-                            <PlusIcon className="size-3.5" />
-                            Add New Dog
-                        </Link>
+                        <div className="flex flex-col items-stretch gap-2">
+                            <Link
+                                href={dogsRoutes.create.url()}
+                                className={buttonClasses('primary', 'sm')}
+                            >
+                                <PlusIcon className="size-3.5" />
+                                Add New Dog
+                            </Link>
+                            <a
+                                href={dogsRoutes.export.url()}
+                                className={buttonClasses('secondary', 'sm')}
+                                download
+                            >
+                                <DownloadIcon className="size-3.5" />
+                                Export Data
+                            </a>
+                        </div>
                     )
                 }
             />
