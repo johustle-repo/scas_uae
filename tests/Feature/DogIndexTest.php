@@ -5,6 +5,7 @@ use App\Enums\Gender;
 use App\Enums\Size;
 use App\Models\Dog;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 test('authenticated users can view the dog list', function () {
     $user = User::factory()->create();
@@ -133,4 +134,17 @@ test('dogs needing review can be listed', function () {
     $response->assertInertia(fn ($page) => $page
         ->has('dogs.data', 2)
         ->where('filters.needs_review', '1'));
+});
+
+test('the dog list does not query vaccinations once per dog', function () {
+    $user = User::factory()->create();
+    Dog::factory()->count(5)->hasVaccinations(2)->create();
+
+    DB::enableQueryLog();
+    $this->actingAs($user)->get(route('dogs.index'))->assertOk();
+
+    $vaccinationQueries = collect(DB::getQueryLog())
+        ->filter(fn (array $query): bool => str_contains($query['query'], 'dog_vaccinations'));
+
+    expect($vaccinationQueries)->toHaveCount(1);
 });

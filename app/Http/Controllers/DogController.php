@@ -34,7 +34,7 @@ class DogController extends Controller
     public function index(Request $request): Response
     {
         $dogs = Dog::query()
-            ->with('identification')
+            ->with(['identification', 'vaccinations'])
             ->when(
                 $request->string('archived')->toString(),
                 fn ($query, string $archived) => $archived === 'only' ? $query->archived() : $query,

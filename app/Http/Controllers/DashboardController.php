@@ -27,7 +27,7 @@ class DashboardController extends Controller
             ],
             'recentlyUpdated' => Dog::query()
                 ->active()
-                ->with('identification')
+                ->with(['identification', 'vaccinations'])
                 ->orderByDesc('updated_at')
                 ->limit(5)
                 ->get(),
