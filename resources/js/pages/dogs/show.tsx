@@ -753,7 +753,10 @@ function MedicalTab({ dog, editing, onDone }: EditableTabProps) {
                                             'initial_health_assessment',
                                             'Initial Health Assessment',
                                         ],
-                                        ['medical_concerns', 'Medical Concerns'],
+                                        [
+                                            'medical_concerns',
+                                            'Medical Concerns',
+                                        ],
                                         [
                                             'treatment_required',
                                             'Treatment Required',
