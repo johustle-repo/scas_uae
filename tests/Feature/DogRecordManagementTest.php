@@ -129,3 +129,23 @@ test('a dog can keep its own microchip number but not use one registered to anot
         ->patch(route('dogs.identification.update', $identification->dog_id), ['microchip_number' => '900200000000002'])
         ->assertSessionHasErrors('microchip_number');
 });
+
+test('the medical profile records and clears spay / neuter status', function () {
+    $user = User::factory()->create();
+    $dog = Dog::factory()->create();
+
+    $this->actingAs($user)->patch(route('dogs.medical.update', $dog), [
+        'spayed_neutered' => '1',
+        'spayed_neutered_date' => '2026-03-02',
+        'medical_concerns' => 'Mild skin allergy',
+    ])->assertRedirect(route('dogs.show', ['dog' => $dog, 'tab' => 'medical']));
+
+    expect($dog->medicalProfile()->first())
+        ->spayed_neutered->toBeTrue()
+        ->spayed_neutered_date->toDateString()->toBe('2026-03-02')
+        ->medical_concerns->toBe('Mild skin allergy');
+
+    $this->actingAs($user)->patch(route('dogs.medical.update', $dog), ['spayed_neutered' => '0']);
+
+    expect($dog->medicalProfile()->first()->spayed_neutered)->toBeFalse();
+});

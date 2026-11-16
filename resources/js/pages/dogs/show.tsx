@@ -39,6 +39,7 @@ import {
     RulerIcon,
     TrashIcon,
 } from '@/components/icons';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ConfirmButton } from '@/components/ui/confirm-button';
 import { Field } from '@/components/ui/field';
 import { Modal } from '@/components/ui/modal';
@@ -673,6 +674,9 @@ function MedicalTab({ dog, editing, onDone }: EditableTabProps) {
     const [treatment, setTreatment] = useState<DogVaccination | 'new' | null>(
         null,
     );
+    const [spayedNeutered, setSpayedNeutered] = useState(
+        Boolean(medical?.spayed_neutered),
+    );
 
     return (
         <div className="space-y-6">
@@ -683,12 +687,43 @@ function MedicalTab({ dog, editing, onDone }: EditableTabProps) {
                         action={updateMedicalProfile(dog.id)}
                         onSuccess={onDone}
                     >
-                        {({ processing }) => (
+                        {({ errors, processing }) => (
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                                <div>
-                                    <Label htmlFor="last_vet_check_date">
-                                        Last Vet Check
-                                    </Label>
+                                <Field
+                                    label="Date of Neuter / Spay"
+                                    htmlFor="spayed_neutered_date"
+                                    error={errors.spayed_neutered_date}
+                                >
+                                    <Input
+                                        id="spayed_neutered_date"
+                                        name="spayed_neutered_date"
+                                        type="date"
+                                        defaultValue={
+                                            medical?.spayed_neutered_date ?? ''
+                                        }
+                                    />
+                                    <input
+                                        type="hidden"
+                                        name="spayed_neutered"
+                                        value={spayedNeutered ? '1' : '0'}
+                                    />
+                                    <label className="mt-2 flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-300">
+                                        <Checkbox
+                                            checked={spayedNeutered}
+                                            onChange={(event) =>
+                                                setSpayedNeutered(
+                                                    event.target.checked,
+                                                )
+                                            }
+                                        />
+                                        Spayed / Neutered
+                                    </label>
+                                </Field>
+                                <Field
+                                    label="Last Vet Check"
+                                    htmlFor="last_vet_check_date"
+                                    error={errors.last_vet_check_date}
+                                >
                                     <Input
                                         id="last_vet_check_date"
                                         name="last_vet_check_date"
@@ -697,11 +732,13 @@ function MedicalTab({ dog, editing, onDone }: EditableTabProps) {
                                             medical?.last_vet_check_date ?? ''
                                         }
                                     />
-                                </div>
-                                <div>
-                                    <Label htmlFor="veterinary_clinic">
-                                        Veterinary Clinic
-                                    </Label>
+                                </Field>
+                                <Field
+                                    label="Veterinary Clinic"
+                                    htmlFor="veterinary_clinic"
+                                    error={errors.veterinary_clinic}
+                                    className="md:col-span-2"
+                                >
                                     <Input
                                         id="veterinary_clinic"
                                         name="veterinary_clinic"
@@ -709,33 +746,43 @@ function MedicalTab({ dog, editing, onDone }: EditableTabProps) {
                                             medical?.veterinary_clinic ?? ''
                                         }
                                     />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <Label htmlFor="medications">
-                                        Medications
-                                    </Label>
-                                    <Textarea
-                                        id="medications"
-                                        name="medications"
-                                        rows={2}
-                                        defaultValue={
-                                            medical?.medications ?? ''
-                                        }
-                                    />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <Label htmlFor="medical_notes">
-                                        Medical Notes
-                                    </Label>
-                                    <Textarea
-                                        id="medical_notes"
-                                        name="medical_notes"
-                                        rows={2}
-                                        defaultValue={
-                                            medical?.medical_notes ?? ''
-                                        }
-                                    />
-                                </div>
+                                </Field>
+                                {(
+                                    [
+                                        [
+                                            'initial_health_assessment',
+                                            'Initial Health Assessment',
+                                        ],
+                                        ['medical_concerns', 'Medical Concerns'],
+                                        [
+                                            'treatment_required',
+                                            'Treatment Required',
+                                        ],
+                                        ['medications', 'Medications'],
+                                        ['medical_notes', 'Medical Notes'],
+                                    ] as const
+                                ).map(([name, label]) => (
+                                    <Field
+                                        key={name}
+                                        label={label}
+                                        htmlFor={name}
+                                        error={errors[name]}
+                                        className="md:col-span-2"
+                                    >
+                                        <Textarea
+                                            id={name}
+                                            name={name}
+                                            rows={2}
+                                            defaultValue={medical?.[name] ?? ''}
+                                        />
+                                    </Field>
+                                ))}
+                                <p className="text-xs text-neutral-500 md:col-span-2 dark:text-neutral-400">
+                                    Microchip and PCC details are edited in the
+                                    Identification tab. Add vaccinations with
+                                    &ldquo;Add Treatment / Vaccination&rdquo;
+                                    below.
+                                </p>
                                 <FormActions
                                     processing={processing}
                                     onCancel={onDone}
@@ -759,7 +806,9 @@ function MedicalTab({ dog, editing, onDone }: EditableTabProps) {
                             [
                                 'Spayed / Neutered',
                                 medical?.spayed_neutered
-                                    ? `Spayed (${formatDate(medical.spayed_neutered_date)})`
+                                    ? medical.spayed_neutered_date
+                                        ? `Yes (${formatDate(medical.spayed_neutered_date)})`
+                                        : 'Yes'
                                     : 'No',
                             ],
                             [
@@ -785,6 +834,18 @@ function MedicalTab({ dog, editing, onDone }: EditableTabProps) {
                             [
                                 'Veterinary Clinic',
                                 medical?.veterinary_clinic ?? '—',
+                            ],
+                            [
+                                'Initial Health Assessment',
+                                medical?.initial_health_assessment ?? '—',
+                            ],
+                            [
+                                'Medical Concerns',
+                                medical?.medical_concerns ?? '—',
+                            ],
+                            [
+                                'Treatment Required',
+                                medical?.treatment_required ?? '—',
                             ],
                             ['Medications', medical?.medications ?? 'None'],
                             ['Medical Notes', medical?.medical_notes ?? '—'],
