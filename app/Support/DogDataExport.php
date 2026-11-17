@@ -15,7 +15,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 /**
- * Exports every dog record (including archived dogs) and their related
+ * Exports every active (non-archived) dog record and its related
  * identification, intake, medical, treatment and placement data as an
  * Excel workbook or a PDF report.
  */
@@ -117,6 +117,7 @@ class DogDataExport
     public function tables(): array
     {
         $dogs = Dog::query()
+            ->active()
             ->with(['identification', 'rescueIntake', 'medicalProfile', ...array_keys(self::RELATED_TABLES)])
             ->orderBy('scas_id')
             ->get();
@@ -155,19 +156,16 @@ class DogDataExport
         $rows = [];
 
         foreach ($dogs as $dog) {
-            $row = array_map(function (array $column) use ($dog): mixed {
+            $rows[] = array_map(function (array $column) use ($dog): mixed {
                 [$relation, $attribute] = $column;
                 $record = $relation === '' ? $dog : $dog->getRelation($relation);
 
                 return $record instanceof Model ? $this->formatValue($record->getAttribute($attribute)) : null;
             }, $columns);
-
-            $row[] = $dog->archived_at === null ? 'No' : 'Yes';
-            $rows[] = $row;
         }
 
         return [
-            'headings' => [...array_map(fn (array $column): string => $this->heading($column[1]), $columns), 'Archived'],
+            'headings' => array_map(fn (array $column): string => $this->heading($column[1]), $columns),
             'rows' => $rows,
         ];
     }

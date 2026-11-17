@@ -34,7 +34,6 @@
                 <th>Gender</th>
                 <th>Current Status</th>
                 <th>Current Location</th>
-                <th>Archived</th>
             </tr>
         </thead>
         <tbody>
@@ -46,7 +45,6 @@
                     <td>{{ $profile['details']['Gender'] ?? '' }}</td>
                     <td>{{ $profile['details']['Current Status'] ?? '' }}</td>
                     <td>{{ $profile['details']['Current Location'] ?? '' }}</td>
-                    <td>{{ $profile['details']['Archived'] ?? '' }}</td>
                 </tr>
             @endforeach
         </tbody>

@@ -30,7 +30,7 @@ function downloadDogExport(User $user): Spreadsheet
     }
 }
 
-test('all dog data can be exported as an excel workbook', function () {
+test('active dog data can be exported as an excel workbook without archived dogs', function () {
     $user = User::factory()->create();
     $dog = Dog::factory()->create(['name' => 'Abby', 'date_of_birth' => '2025-01-10']);
     DogIdentification::factory()->for($dog)->create(['microchip_number' => '900200000000001']);
@@ -46,11 +46,12 @@ test('all dog data can be exported as an excel workbook', function () {
     $headings = $dogs[0];
     $abby = collect($dogs)->firstWhere(array_search('Name', $headings), 'Abby');
 
-    expect(count($dogs))->toBe(3)
+    expect(count($dogs))->toBe(2)
         ->and($abby[array_search('SCAS ID', $headings)])->toBe($dog->scas_id)
         ->and($abby[array_search('Date Of Birth', $headings)])->toBe('2025-01-10')
         ->and($abby[array_search('Microchip Number', $headings)])->toBe('900200000000001')
-        ->and(collect($dogs)->pluck(array_search('Name', $headings)))->toContain('Goldie');
+        ->and(collect($dogs)->pluck(array_search('Name', $headings)))->not->toContain('Goldie')
+        ->and($headings)->not->toContain('Archived');
 
     $vaccinations = $workbook->getSheetByName('Treatments & Vaccinations')->toArray();
 
