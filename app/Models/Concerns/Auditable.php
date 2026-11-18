@@ -59,7 +59,8 @@ trait Auditable
                 action: $model->auditKey().'.deleted',
                 description: 'Deleted '.$model->auditDescription(),
                 subject: $model,
-                dogId: $model->auditDogId(),
+                // A deleted dog's row is gone, so its own entry cannot reference it.
+                dogId: $model instanceof Dog ? null : $model->auditDogId(),
                 oldValues: $model->auditableValues($model->getAttributes()),
             );
         });

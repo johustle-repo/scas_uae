@@ -6,7 +6,7 @@ import { type ReactNode, useState } from 'react';
 interface ConfirmButtonProps extends Omit<ButtonProps, 'onClick'> {
     /** Route definition to submit once the user confirms. */
     action: { url: string; method: 'get' | 'post' | 'put' | 'patch' | 'delete' };
-    data?: Record<string, string | number | boolean | null>;
+    data?: Record<string, string | number | boolean | null | number[]>;
     title: string;
     message: ReactNode;
     confirmLabel?: string;

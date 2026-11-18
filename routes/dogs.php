@@ -3,6 +3,7 @@
 use App\Http\Controllers\DogController;
 use App\Http\Controllers\Dogs\AdoptionRecordController;
 use App\Http\Controllers\Dogs\ArchiveController;
+use App\Http\Controllers\Dogs\BulkDeleteController;
 use App\Http\Controllers\Dogs\DocumentController;
 use App\Http\Controllers\Dogs\ExportController;
 use App\Http\Controllers\Dogs\FosterRecordController;
@@ -20,6 +21,7 @@ Route::middleware('auth')->group(function (): void {
         Route::get('dogs/create', [DogController::class, 'create'])->name('dogs.create');
         Route::get('dogs/export/{format}', ExportController::class)->whereIn('format', ['excel', 'pdf'])->name('dogs.export');
         Route::post('dogs', [DogController::class, 'store'])->name('dogs.store');
+        Route::delete('dogs', BulkDeleteController::class)->name('dogs.bulk-destroy');
         Route::get('dogs/{dog}/edit', [DogController::class, 'edit'])->name('dogs.edit');
         Route::put('dogs/{dog}', [DogController::class, 'update'])->name('dogs.update');
         Route::patch('dogs/{dog}/identification', [IdentificationController::class, 'update'])->name('dogs.identification.update');

@@ -17,10 +17,13 @@ import {
     PlusIcon,
     ResetIcon,
     SearchIcon,
+    TrashIcon,
 } from '@/components/icons';
 import { PageHeader } from '@/components/page-header';
 import { buttonClasses } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ConfirmButton } from '@/components/ui/confirm-button';
 import { Pagination } from '@/components/ui/pagination';
 import {
     Table,
@@ -116,6 +119,24 @@ export default function DogsIndex({
     ];
 
     const showingArchived = filters.archived === 'only';
+    const canDelete = can('manage-dogs');
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const visibleIds = dogs.data.map((dog) => dog.id);
+    const selected = selectedIds.filter((id) => visibleIds.includes(id));
+    const allSelected =
+        visibleIds.length > 0 && selected.length === visibleIds.length;
+
+    function toggleDog(id: number) {
+        setSelectedIds(
+            selected.includes(id)
+                ? selected.filter((selectedId) => selectedId !== id)
+                : [...selected, id],
+        );
+    }
+
+    function toggleAll() {
+        setSelectedIds(allSelected ? [] : visibleIds);
+    }
 
     return (
         <>
@@ -248,10 +269,59 @@ export default function DogsIndex({
                 />
             )}
 
+            {canDelete && selected.length > 0 && (
+                <div className="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-xs text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+                    <span className="font-medium">
+                        {selected.length} selected
+                    </span>
+                    <button
+                        type="button"
+                        onClick={() => setSelectedIds([])}
+                        className="text-red-700 underline-offset-2 hover:underline dark:text-red-300"
+                    >
+                        Clear selection
+                    </button>
+                    <ConfirmButton
+                        action={dogsRoutes.bulkDestroy()}
+                        data={{ ids: selected }}
+                        title={`Delete ${selected.length} ${selected.length === 1 ? 'dog' : 'dogs'}?`}
+                        message={
+                            <>
+                                This permanently deletes the selected{' '}
+                                {selected.length === 1 ? 'dog' : 'dogs'} with
+                                all medical, placement and identification
+                                records, documents and photos. This cannot be
+                                undone.
+                                {!showingArchived &&
+                                    ' To only hide a dog from lists, archive it instead.'}
+                            </>
+                        }
+                        confirmLabel="Delete permanently"
+                        onSuccess={() => setSelectedIds([])}
+                        variant="danger"
+                        size="sm"
+                        className="ml-auto"
+                    >
+                        <TrashIcon className="size-3.5" />
+                        Delete selected
+                    </ConfirmButton>
+                </div>
+            )}
+
             <Card className="overflow-hidden">
                 <Table>
                     <TableHead>
                         <TableRow>
+                            {canDelete && (
+                                <TableHeaderCell className="w-10 pr-0">
+                                    <Checkbox
+                                        checked={allSelected}
+                                        onChange={toggleAll}
+                                        disabled={visibleIds.length === 0}
+                                        aria-label="Select all dogs on this page"
+                                    />
+                                </TableHeaderCell>
+                            )}
                             <TableHeaderCell>Photo</TableHeaderCell>
                             <TableHeaderCell>Dog</TableHeaderCell>
                             <TableHeaderCell>ID</TableHeaderCell>
@@ -272,6 +342,18 @@ export default function DogsIndex({
                                     router.visit(dogsRoutes.show.url(dog.id))
                                 }
                             >
+                                {canDelete && (
+                                    <TableCell
+                                        className="w-10 py-2 pr-0"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <Checkbox
+                                            checked={selected.includes(dog.id)}
+                                            onChange={() => toggleDog(dog.id)}
+                                            aria-label={`Select ${dog.name}`}
+                                        />
+                                    </TableCell>
+                                )}
                                 <TableCell className="py-2">
                                     <DogAvatar dog={dog} className="size-10" />
                                 </TableCell>
@@ -310,7 +392,7 @@ export default function DogsIndex({
                         {dogs.data.length === 0 && (
                             <TableRow>
                                 <TableCell
-                                    colSpan={9}
+                                    colSpan={canDelete ? 10 : 9}
                                     className="py-10 text-center text-neutral-400"
                                 >
                                     No dogs match these filters.
