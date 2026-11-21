@@ -735,6 +735,7 @@ function RegisterDetails({ dog }: { dog: Dog }) {
                         ['Lead walking', text(dog.lead_walking)],
                         ['Basic commands', text(dog.basic_commands_notes)],
                         ['Vaccination status', text(dog.vaccination_status)],
+                        ['Microchip status', text(dog.microchip_status)],
                         ['Care summary', text(dog.care_summary)],
                         ['Feeding guidance', text(dog.feeding_guidance)],
                         ['Profile URL', link(dog.profile_url)],

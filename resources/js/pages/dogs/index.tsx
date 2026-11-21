@@ -487,8 +487,17 @@ function ExportMenu() {
     }, [position]);
 
     const options = [
-        { format: 'excel', label: 'Excel (.xlsx)' },
-        { format: 'pdf', label: 'PDF (.pdf)' },
+        {
+            format: 'excel',
+            label: 'Excel (.xlsx)',
+            hint: 'Dog Register format; can be imported back',
+        },
+        {
+            format: 'records',
+            label: 'Full records (.xlsx)',
+            hint: 'Every table: medical, placements and more',
+        },
+        { format: 'pdf', label: 'PDF (.pdf)', hint: 'Printable profiles' },
     ] as const;
 
     return (
@@ -511,7 +520,7 @@ function ExportMenu() {
                         ref={menuRef}
                         role="menu"
                         style={{ top: position.top, right: position.right }}
-                        className="fixed z-50 w-40 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
+                        className="fixed z-50 w-64 overflow-hidden rounded-lg border border-neutral-200 bg-white py-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
                     >
                         {options.map((option) => (
                             <a
@@ -522,9 +531,14 @@ function ExportMenu() {
                                 })}
                                 download
                                 onClick={close}
-                                className="block px-3 py-1.5 text-xs text-neutral-700 hover:bg-brand-50 hover:text-brand-800 focus:bg-brand-50 focus:outline-none dark:text-neutral-200 dark:hover:bg-brand-950 dark:hover:text-brand-200 dark:focus:bg-brand-950"
+                                className="block px-3 py-2 text-xs text-neutral-700 hover:bg-brand-50 hover:text-brand-800 focus:bg-brand-50 focus:outline-none dark:text-neutral-200 dark:hover:bg-brand-950 dark:hover:text-brand-200 dark:focus:bg-brand-950"
                             >
-                                {option.label}
+                                <span className="block font-medium">
+                                    {option.label}
+                                </span>
+                                <span className="block text-[11px] text-neutral-500 dark:text-neutral-400">
+                                    {option.hint}
+                                </span>
                             </a>
                         ))}
                     </div>,

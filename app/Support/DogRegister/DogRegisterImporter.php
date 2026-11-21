@@ -35,9 +35,8 @@ final class DogRegisterImporter
 
     /**
      * Register headers (lowercased) mapped to the importer's field keys.
-     * "Age (months)", "Bot sequence (calculated)" and "Microchip status" are
-     * deliberately absent: the first two are spreadsheet formulas and the
-     * last carries no chip number to store.
+     * "Age (months)" and "Bot sequence (calculated)" are deliberately absent:
+     * they are spreadsheet formulas.
      *
      * @var array<string, string>
      */
@@ -70,6 +69,7 @@ final class DogRegisterImporter
         'lead walking' => 'lead_walking',
         'basic commands' => 'basic_commands_notes',
         'vaccination status' => 'vaccination_status',
+        'microchip status' => 'microchip_status',
         'neutering status' => 'neutering_status',
         'approved care summary' => 'care_summary',
         'approved feeding guidance' => 'feeding_guidance',
@@ -99,6 +99,7 @@ final class DogRegisterImporter
         'alone_time_observations' => 65535,
         'basic_commands_notes' => 65535,
         'vaccination_status' => 255,
+        'microchip_status' => 255,
         'care_summary' => 65535,
         'feeding_guidance' => 65535,
         'reviewed_by' => 255,

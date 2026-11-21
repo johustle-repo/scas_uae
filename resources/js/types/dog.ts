@@ -168,6 +168,7 @@ export interface Dog {
     house_training: string | null;
     lead_walking: string | null;
     vaccination_status: string | null;
+    microchip_status: string | null;
     care_summary: string | null;
     feeding_guidance: string | null;
     register_photo_url: string | null;

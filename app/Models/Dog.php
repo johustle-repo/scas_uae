@@ -71,6 +71,7 @@ use Illuminate\Support\Str;
  * @property string|null $house_training
  * @property string|null $lead_walking
  * @property string|null $vaccination_status
+ * @property string|null $microchip_status
  * @property string|null $care_summary
  * @property string|null $feeding_guidance
  * @property string|null $register_photo_url
@@ -128,6 +129,7 @@ use Illuminate\Support\Str;
     'house_training',
     'lead_walking',
     'vaccination_status',
+    'microchip_status',
     'care_summary',
     'feeding_guidance',
     'register_photo_url',

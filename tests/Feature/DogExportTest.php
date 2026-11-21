@@ -13,12 +13,12 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 /**
  * Download the export and load it back as a workbook.
  */
-function downloadDogExport(User $user): Spreadsheet
+function downloadDogExport(User $user, string $format = 'records', string $filename = 'scas-dogs'): Spreadsheet
 {
-    $response = test()->actingAs($user)->get(route('dogs.export', 'excel'));
+    $response = test()->actingAs($user)->get(route('dogs.export', $format));
 
     $response->assertOk();
-    $response->assertDownload('scas-dogs-'.now()->format('Y-m-d').'.xlsx');
+    $response->assertDownload($filename.'-'.now()->format('Y-m-d').'.xlsx');
 
     $path = tempnam(sys_get_temp_dir(), 'dog-export');
     file_put_contents($path, $response->streamedContent());
@@ -30,7 +30,7 @@ function downloadDogExport(User $user): Spreadsheet
     }
 }
 
-test('active dog data can be exported as an excel workbook without archived dogs', function () {
+test('active dog data can be exported as a full records workbook without archived dogs', function () {
     $user = User::factory()->create();
     $dog = Dog::factory()->create(['name' => 'Abby', 'date_of_birth' => '2025-01-10']);
     DogIdentification::factory()->for($dog)->create(['microchip_number' => '900200000000001']);
@@ -98,8 +98,39 @@ test('users who cannot manage dogs cannot export data', function (string $format
     $user = User::factory()->role(UserRole::MedicalStaff)->create();
 
     $this->actingAs($user)->get(route('dogs.export', $format))->assertForbidden();
-})->with(['excel', 'pdf']);
+})->with(['excel', 'records', 'pdf']);
 
 test('guests cannot export data', function () {
     $this->get(route('dogs.export', 'excel'))->assertRedirect(route('login'));
+});
+
+test('the excel export uses the dog register layout', function () {
+    Dog::factory()->create([
+        'scas_id' => 'SCAS-084', 'name' => 'Sindy', 'gender' => 'female', 'energy_level' => 'medium',
+        'date_of_birth' => '2023-12-01', 'date_of_birth_is_approximate' => false, 'good_with_children' => true,
+    ]);
+    Dog::factory()->create(['scas_id' => 'SCAS-085', 'archived_at' => now()]);
+
+    $sheet = downloadDogExport(User::factory()->create(), 'excel', 'scas-dog-register')->getSheetByName('Dog Register');
+
+    expect($sheet->rangeToArray('A1:AM1')[0])->toBe([
+        'Dog ID', 'Dog name', 'Publish to bot', 'Adoption status', 'Foster status', 'Sex', 'Breed or type', 'Date of birth',
+        'Birth date basis', 'Age (months)', 'Current size', 'Expected adult size', 'Weight (kg)', 'Date weighed', 'Energy level',
+        'Personality', 'Children assessment', 'Children observations', 'Dogs assessment', 'Dogs observations', 'Cats assessment',
+        'Cats observations', 'Home requirements', 'Owner experience', 'Alone time observations', 'House training', 'Lead walking',
+        'Basic commands', 'Vaccination status', 'Neutering status', 'Microchip status', 'Approved care summary',
+        'Approved feeding guidance', 'Known background', 'Photo URL', 'Profile URL', 'Last reviewed', 'Reviewed by',
+        'Bot sequence (calculated)',
+    ]);
+    expect($sheet->getCell('A2')->getValue())->toBe('SCAS-084')
+        ->and($sheet->getCell('A3')->getValue())->toBeNull()
+        ->and($sheet->getCell('F2')->getValue())->toBe('Female')
+        ->and($sheet->getCell('H2')->getFormattedValue())->toBe('01 Dec 2023')
+        ->and($sheet->getCell('I2')->getValue())->toBe('Exact')
+        ->and($sheet->getCell('O2')->getValue())->toBe('Moderate')
+        ->and($sheet->getCell('Q2')->getValue())->toBe('Positive observations')
+        ->and($sheet->getCell('J2')->getValue())->toStartWith('=IF(H2="","",')
+        ->and($sheet->getCell('AM2')->getValue())->toStartWith('=IF(AND(A2<>"",B2<>"",C2="Yes",D2="Available")')
+        ->and($sheet->getCell('F2')->getDataValidation()->getFormula1())->toBe('"Male,Female,Unknown"')
+        ->and($sheet->getStyle('A1')->getFill()->getStartColor()->getARGB())->toBe('FF283B53');
 });

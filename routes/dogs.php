@@ -20,7 +20,7 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('can:manage-dogs')->group(function (): void {
         Route::get('dogs/create', [DogController::class, 'create'])->name('dogs.create');
-        Route::get('dogs/export/{format}', ExportController::class)->whereIn('format', ['excel', 'pdf'])->middleware('throttle:10,1')->name('dogs.export');
+        Route::get('dogs/export/{format}', ExportController::class)->whereIn('format', ['excel', 'records', 'pdf'])->middleware('throttle:10,1')->name('dogs.export');
         Route::post('dogs', [DogController::class, 'store'])->name('dogs.store');
         Route::post('dogs/import', [RegisterImportController::class, 'preview'])->middleware('throttle:10,1')->name('dogs.import');
         Route::post('dogs/import/confirm', [RegisterImportController::class, 'confirm'])->middleware('throttle:10,1')->name('dogs.import.confirm');

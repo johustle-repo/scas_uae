@@ -251,3 +251,23 @@ test('the register can be imported from a csv file with day-first dates', functi
         ->and($dog->gender)->toBe(Gender::Female)
         ->and($dog->date_of_birth?->toDateString())->toBe('2023-12-01');
 });
+
+test('an exported register imports back without changing any dog', function () {
+    $user = User::factory()->create();
+    importDogRegister($this->actingAs($user), dogRegisterUpload([
+        [
+            'Dog ID' => 'SCAS-084', 'Dog name' => 'Sindy', 'Publish to bot' => 'Yes', 'Adoption status' => 'Available', 'Sex' => 'Female',
+            'Breed or type' => 'German Shepherd', 'Date of birth' => '2023-12-01', 'Current size' => 'Large', 'Weight (kg)' => 45,
+            'Energy level' => 'Moderate', 'Personality' => 'Friendly and shy', 'Children assessment' => 'Not assessed',
+            'Cats assessment' => 'Not suitable', 'Lead walking' => 'In progress', 'Neutering status' => 'Yes', 'Known background' => 'Found in Sharjah.',
+        ],
+        ['Dog ID' => 'SCAS-046', 'Dog name' => 'Mara', 'Sex' => 'Female', 'Energy level' => 'High'],
+    ]));
+
+    $response = $this->actingAs($user)->get(route('dogs.export', 'excel'));
+    $path = storage_path('framework/testing/register-export-'.uniqid().'.xlsx');
+    file_put_contents($path, $response->streamedContent());
+
+    importDogRegister($this->actingAs($user), new UploadedFile($path, 'export.xlsx', null, null, true))
+        ->assertSessionHas('success', 'Dog Register imported: 0 added, 0 updated, 2 unchanged, 0 skipped.');
+});
