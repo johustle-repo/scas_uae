@@ -29,10 +29,16 @@ deploy() {
     # Any other change on the server is someone's edit: stop and show it.
     [ -z "$(git status --short)" ] || { echo "ABORT: uncommitted changes on server:"; git status --short; exit 1; }
 
+    # Cached config/services from the previous release can name packages or config files the
+    # new code changes; artisan (and composer's package:discover) would boot with them and
+    # crash. They are rebuilt by "artisan optimize" below, so drop them before anything boots.
+    rm -f bootstrap/cache/*.php
+
     "$P" artisan down --retry=60
     trap '"$P" artisan up' EXIT
     git pull --ff-only
     git log -1 --oneline
+    rm -f bootstrap/cache/*.php
     "$P" "$(command -v composer)" install --no-dev --prefer-dist --optimize-autoloader --no-interaction
     "$P" artisan migrate --force
     "$P" artisan optimize:clear
