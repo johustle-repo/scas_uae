@@ -20,6 +20,22 @@ test('every user can open a report as a table', function () {
         ->where('report.rows.0.0', 'SCAS-001'));
 });
 
+test('the reports list loads row counts and headline numbers after the page', function () {
+    Dog::factory()->count(2)->create(['current_status' => DogStatus::AtScas]);
+    Dog::factory()->create(['current_status' => DogStatus::AdoptedUae]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('reports.index'))
+        ->assertInertia(fn ($page) => $page
+            ->component('reports/index')
+            ->missing('rowCounts')
+            ->loadDeferredProps(fn ($reload) => $reload
+                ->where('rowCounts.all_dogs', 3)
+                ->where('rowCounts.at_scas', 2)
+                ->where('rowCounts.adopted', 1)
+                ->where('summary.0', ['Total dogs', '3'])));
+});
+
 test('the summary report counts dogs by placement', function () {
     Dog::factory()->count(2)->create(['current_status' => DogStatus::AtScas]);
     Dog::factory()->create(['current_status' => DogStatus::InternationalFoster]);

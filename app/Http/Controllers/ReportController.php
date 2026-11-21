@@ -13,12 +13,17 @@ class ReportController extends Controller
     /**
      * List the available reports.
      */
-    public function index(): Response
+    public function index(DogReports $reports): Response
     {
         return Inertia::render('reports/index', [
             'reports' => collect(DogReports::REPORTS)
                 ->map(fn (array $report, string $key): array => ['key' => $key, ...$report])
                 ->values(),
+            'rowCounts' => Inertia::defer(fn (): array => collect(DogReports::REPORTS)
+                ->keys()
+                ->mapWithKeys(fn (string $key): array => [$key => count($reports->build($key)['rows'])])
+                ->all()),
+            'summary' => Inertia::defer(fn (): array => $reports->build('summary')['rows']),
         ]);
     }
 
