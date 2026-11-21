@@ -7,6 +7,7 @@ use App\Models\DogIdentification;
 use App\Models\DogVaccination;
 use App\Models\User;
 use App\Support\DogDataExport;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
@@ -133,4 +134,24 @@ test('the excel export uses the dog register layout', function () {
         ->and($sheet->getCell('AM2')->getValue())->toStartWith('=IF(AND(A2<>"",B2<>"",C2="Yes",D2="Available")')
         ->and($sheet->getCell('F2')->getDataValidation()->getFormula1())->toBe('"Male,Female,Unknown"')
         ->and($sheet->getStyle('A1')->getFill()->getStartColor()->getARGB())->toBe('FF283B53');
+});
+
+test('pdf profiles embed uploaded photos cropped square and never fetch remote photos', function () {
+    Storage::fake('local');
+    $image = imagecreatetruecolor(800, 600);
+    ob_start();
+    imagejpeg($image);
+    Storage::disk('local')->put('dog-photos/1/abby.jpg', (string) ob_get_clean());
+    Dog::factory()->create(['scas_id' => 'SCAS-001', 'photo_path' => 'dog-photos/1/abby.jpg']);
+    Dog::factory()->create(['scas_id' => 'SCAS-002', 'photo_path' => 'https://example.com/remote.jpg']);
+    Dog::factory()->create(['scas_id' => 'SCAS-003', 'photo_path' => null]);
+
+    $photos = collect(app(DogDataExport::class)->profiles(withPhotos: true))
+        ->mapWithKeys(fn (array $profile): array => [$profile['details']['SCAS ID'] => $profile['photo']]);
+
+    expect($photos['SCAS-001'])->toStartWith('data:image/jpeg;base64,')
+        ->and(getimagesizefromstring(base64_decode(substr($photos['SCAS-001'], 23)))[0])->toBe(320)
+        ->and(getimagesizefromstring(base64_decode(substr($photos['SCAS-001'], 23)))[1])->toBe(320)
+        ->and($photos['SCAS-002'])->toBeNull()
+        ->and($photos['SCAS-003'])->toBeNull();
 });

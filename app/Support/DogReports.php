@@ -106,8 +106,13 @@ class DogReports
      */
     public function pdfOutput(array $report): string
     {
-        return Pdf::loadView('exports.report', ['report' => $report, 'generatedAt' => now()])
+        return Pdf::loadView('exports.report', [
+            'report' => $report,
+            'logo' => PdfImage::dataUri(public_path('images/scas-logo.png'), 160, keepTransparency: true),
+            'generatedAt' => now(),
+        ])
             ->setPaper('a4', count($report['headings']) > 5 ? 'landscape' : 'portrait')
+            ->setOption('isFontSubsettingEnabled', true)
             ->output();
     }
 

@@ -8,6 +8,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\Cell\StringValueBinder;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -63,24 +64,45 @@ class DogDataExport
      */
     public function pdfOutput(): string
     {
+        $logo = PdfImage::dataUri(public_path('images/scas-logo.png'), 240, keepTransparency: true);
+
         return Pdf::loadView('exports.dogs', [
-            'profiles' => $this->profiles(),
+            'profiles' => $this->profiles(withPhotos: true),
+            'logo' => $logo,
             'generatedAt' => now(),
-        ])->setPaper('a4')->output();
+        ])->setPaper('a4')->setOption('isFontSubsettingEnabled', true)->output();
+    }
+
+    /**
+     * A dog's uploaded profile photo, scaled down for the PDF. Photos held on
+     * other websites are not fetched, so those dogs show the SCAS logo.
+     */
+    protected function profilePhoto(?string $photoPath): ?string
+    {
+        if (blank($photoPath) || preg_match('#^(https?:)?//#', $photoPath) === 1 || str_starts_with($photoPath, '/')) {
+            return null;
+        }
+
+        return PdfImage::dataUri(Storage::disk('local')->path($photoPath), 320, square: true);
     }
 
     /**
      * One profile per dog: its non-empty details, plus its related records
      * grouped by table title (without the SCAS ID / dog name columns).
      *
-     * @return list<array{details: array<string, mixed>, related: array<string, array{headings: list<string>, rows: list<list<mixed>>}>}>
+     * With $withPhotos, each profile also carries its profile photo as a data URI.
+     *
+     * @return list<array{details: array<string, mixed>, related: array<string, array{headings: list<string>, rows: list<list<mixed>>}>, photo: string|null}>
      */
-    public function profiles(): array
+    public function profiles(bool $withPhotos = false): array
     {
         $tables = $this->tables();
         $dogTable = $tables['Dogs'];
+        $photoPaths = $withPhotos
+            ? Dog::query()->active()->pluck('photo_path', 'scas_id')->all()
+            : [];
 
-        return array_map(function (array $row) use ($dogTable, $tables): array {
+        return array_map(function (array $row) use ($dogTable, $tables, $photoPaths): array {
             $details = array_combine($dogTable['headings'], $row);
             $related = [];
 
@@ -104,6 +126,7 @@ class DogDataExport
                     fn (mixed $value): bool => $value !== null && $value !== '',
                 ),
                 'related' => $related,
+                'photo' => $this->profilePhoto($photoPaths[$details['SCAS ID']] ?? null),
             ];
         }, $dogTable['rows']);
     }
