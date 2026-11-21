@@ -25,4 +25,7 @@ enum Permission: string
 
     /** View the system audit log. */
     case ViewAuditLog = 'view-audit-log';
+
+    /** Run, download and delete backups of the database and uploaded files. */
+    case ManageBackups = 'manage-backups';
 }

@@ -5,13 +5,16 @@ import {
     destroy as destroyAvatar,
     store as storeAvatar,
 } from '@/actions/App/Http/Controllers/Settings/AvatarController';
+import PreferenceController from '@/actions/App/Http/Controllers/Settings/PreferenceController';
 import { destroy as destroySessions } from '@/actions/App/Http/Controllers/Settings/SessionController';
 import { AppearancePicker } from '@/components/appearance-picker';
 import {
     AlertIcon,
     CalendarIcon,
     CheckIcon,
+    ArchiveIcon,
     ChevronRightIcon,
+    FolderIcon,
     HistoryIcon,
     KeyIcon,
     LogoutIcon,
@@ -29,6 +32,7 @@ import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ConfirmButton } from '@/components/ui/confirm-button';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -37,6 +41,7 @@ import { UserAvatar } from '@/components/user-avatar';
 import { AuthenticatedLayout } from '@/layouts/authenticated-layout';
 import { useCan } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
+import dogsRoutes from '@/routes/dogs';
 import settingsRoutes from '@/routes/settings';
 import type { Auth } from '@/types/auth';
 import { formatDate, formatDateTime } from '@/types/dog';
@@ -94,6 +99,26 @@ export default function ProfileSettings({
                   },
               ]
             : []),
+        ...(can('manage-backups')
+            ? [
+                  {
+                      label: 'Data Backup',
+                      description: 'Run, download and manage backups',
+                      href: settingsRoutes.backups.index.url(),
+                      icon: FolderIcon,
+                  },
+              ]
+            : []),
+        ...(can('manage-dogs')
+            ? [
+                  {
+                      label: 'Import / Export',
+                      description: 'Import the Dog Register or export dog data',
+                      href: dogsRoutes.index.url(),
+                      icon: UploadIcon,
+                  },
+              ]
+            : []),
         ...(can('view-audit-log')
             ? [
                   {
@@ -136,6 +161,8 @@ export default function ProfileSettings({
                             <AppearancePicker />
                         </CardContent>
                     </Card>
+
+                    <PreferencesCard auth={auth} />
 
                     <RecentActivityCard entries={recentActivity} />
 
@@ -382,6 +409,44 @@ function AccountHero({
                     </Form>
                 </div>
             </div>
+        </Card>
+    );
+}
+
+function PreferencesCard({ auth }: { auth: Auth }) {
+    const showArchived = Boolean(auth.user.show_archived_records);
+
+    function toggle() {
+        router.visit(PreferenceController(), {
+            data: { show_archived_records: !showArchived },
+            preserveScroll: true,
+        });
+    }
+
+    return (
+        <Card>
+            <SectionHeader
+                icon={ArchiveIcon}
+                title="Preferences"
+                description="How records are listed for you."
+            />
+            <CardContent className="pt-0">
+                <label className="flex items-start gap-3 text-sm">
+                    <Checkbox
+                        checked={showArchived}
+                        onChange={toggle}
+                        className="mt-0.5"
+                    />
+                    <span>
+                        <span className="block font-medium text-neutral-900 dark:text-neutral-100">
+                            Show archived records
+                        </span>
+                        <span className="block text-xs text-neutral-500 dark:text-neutral-400">
+                            Include archived dogs in the All Dogs list.
+                        </span>
+                    </span>
+                </label>
+            </CardContent>
         </Card>
     );
 }

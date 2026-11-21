@@ -1,4 +1,5 @@
 import { update } from '@/actions/App/Http/Controllers/AdoptionRequestController';
+import { DEFAULT_DOG_PHOTO } from '@/components/dogs/dog-avatar';
 import { CheckIcon, HeartIcon, HomeIcon, SearchIcon } from '@/components/icons';
 import { PageHeader } from '@/components/page-header';
 import { Badge, type BadgeTone } from '@/components/ui/badge';
@@ -447,7 +448,11 @@ function DogThumb({ dog }: { dog: AdoptionRequest['dog'] }) {
     return (
         <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700 dark:bg-brand-900/60 dark:text-brand-300">
             {dog ? (
-                <span className="text-sm font-bold">{dog.name.charAt(0)}</span>
+                <img
+                    src={DEFAULT_DOG_PHOTO}
+                    alt={dog.name}
+                    className="size-full object-contain p-1.5"
+                />
             ) : (
                 <HomeIcon className="size-5" />
             )}

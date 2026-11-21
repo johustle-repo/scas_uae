@@ -53,6 +53,31 @@ use Illuminate\Support\Str;
  * @property string|null $behavioural_notes
  * @property string|null $special_requirements
  * @property Carbon|null $archived_at
+ * @property bool|null $publish_to_bot
+ * @property string|null $adoption_status
+ * @property string|null $foster_status
+ * @property Size|null $expected_adult_size
+ * @property string|null $weight_kg
+ * @property Carbon|null $weighed_on
+ * @property string|null $children_assessment
+ * @property string|null $children_observations
+ * @property string|null $dogs_assessment
+ * @property string|null $dogs_observations
+ * @property string|null $cats_assessment
+ * @property string|null $cats_observations
+ * @property string|null $home_requirements
+ * @property string|null $owner_experience
+ * @property string|null $alone_time_observations
+ * @property string|null $house_training
+ * @property string|null $lead_walking
+ * @property string|null $vaccination_status
+ * @property string|null $care_summary
+ * @property string|null $feeding_guidance
+ * @property string|null $register_photo_url
+ * @property string|null $profile_url
+ * @property Carbon|null $last_reviewed_on
+ * @property string|null $reviewed_by
+ * @property Carbon|null $register_imported_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -85,6 +110,31 @@ use Illuminate\Support\Str;
     'behavioural_notes',
     'special_requirements',
     'archived_at',
+    'publish_to_bot',
+    'adoption_status',
+    'foster_status',
+    'expected_adult_size',
+    'weight_kg',
+    'weighed_on',
+    'children_assessment',
+    'children_observations',
+    'dogs_assessment',
+    'dogs_observations',
+    'cats_assessment',
+    'cats_observations',
+    'home_requirements',
+    'owner_experience',
+    'alone_time_observations',
+    'house_training',
+    'lead_walking',
+    'vaccination_status',
+    'care_summary',
+    'feeding_guidance',
+    'register_photo_url',
+    'profile_url',
+    'last_reviewed_on',
+    'reviewed_by',
+    'register_imported_at',
 ])]
 class Dog extends Model
 {
@@ -125,6 +175,12 @@ class Dog extends Model
             'potty_trained' => 'boolean',
             'leash_trained' => 'boolean',
             'archived_at' => 'datetime',
+            'publish_to_bot' => 'boolean',
+            'expected_adult_size' => Size::class,
+            'weight_kg' => 'decimal:2',
+            'weighed_on' => 'date:Y-m-d',
+            'last_reviewed_on' => 'date:Y-m-d',
+            'register_imported_at' => 'datetime',
         ];
     }
 
@@ -431,7 +487,8 @@ class Dog extends Model
 
     /**
      * URL of the profile photo. Uploaded photos are served through an
-     * authenticated route; legacy absolute URLs are passed through.
+     * authenticated route; legacy absolute URLs are passed through. Without a
+     * photo, the Dog Register's photo URL is used.
      *
      * @return Attribute<string|null, never>
      */
@@ -440,7 +497,7 @@ class Dog extends Model
         return Attribute::make(
             get: function (): ?string {
                 if (blank($this->photo_path)) {
-                    return null;
+                    return $this->register_photo_url;
                 }
 
                 if (preg_match('#^(https?:)?//#', $this->photo_path) === 1 || str_starts_with($this->photo_path, '/')) {

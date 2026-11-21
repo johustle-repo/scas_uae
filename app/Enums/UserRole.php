@@ -24,7 +24,7 @@ enum UserRole: string
     public function description(): string
     {
         return match ($this) {
-            self::Admin => 'Full access, including users and system logs.',
+            self::Admin => 'Full access, including users, system logs and backups.',
             self::RecordsManager => 'Manages all dog records, medical and placement details, and documents.',
             self::MedicalStaff => 'Manages medical records, treatments and medical documents.',
             self::PlacementCoordinator => 'Manages foster and adoption placements and their documents.',

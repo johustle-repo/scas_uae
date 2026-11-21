@@ -55,6 +55,8 @@ class HandleInertiaRequests extends Middleware
             ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
+                'importResult' => fn () => $request->session()->get('importResult'),
+                'importPreview' => fn () => $request->session()->get('importPreview'),
             ],
             'sidebarOpen' => $request->cookie('sidebar_open', 'true') === 'true',
             'newAdoptionRequests' => fn (): int => $user?->hasPermission(Permission::ManagePlacements)

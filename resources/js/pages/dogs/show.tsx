@@ -537,74 +537,78 @@ function OverviewTab({ dog }: { dog: Dog }) {
 
     return (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-            <Card className="lg:col-span-3">
-                <CardHeader>
-                    <CardTitle>About {dog.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-5 pt-0">
-                    <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-                        {dog.personality_description ??
-                            'No personality description recorded yet.'}
-                    </p>
+            <div className="space-y-6 lg:col-span-3">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>About {dog.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-5 pt-0">
+                        <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                            {dog.personality_description ??
+                                'No personality description recorded yet.'}
+                        </p>
 
-                    <div>
-                        <h4 className="mb-2 text-xs font-semibold text-neutral-900 dark:text-neutral-100">
-                            Good With
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                            <Chip active={Boolean(dog.good_with_dogs)}>
-                                Dogs
-                            </Chip>
-                            <Chip active={Boolean(dog.good_with_cats)}>
-                                Cats
-                            </Chip>
-                            <Chip active={Boolean(dog.good_with_children)}>
-                                Kids
-                            </Chip>
-                            <Chip active={Boolean(dog.good_with_adults)}>
-                                Adults
-                            </Chip>
+                        <div>
+                            <h4 className="mb-2 text-xs font-semibold text-neutral-900 dark:text-neutral-100">
+                                Good With
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                                <Chip active={Boolean(dog.good_with_dogs)}>
+                                    Dogs
+                                </Chip>
+                                <Chip active={Boolean(dog.good_with_cats)}>
+                                    Cats
+                                </Chip>
+                                <Chip active={Boolean(dog.good_with_children)}>
+                                    Kids
+                                </Chip>
+                                <Chip active={Boolean(dog.good_with_adults)}>
+                                    Adults
+                                </Chip>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className="flex items-center gap-3">
-                        <h4 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100">
-                            Energy Level
-                        </h4>
-                        {dog.energy_level ? (
-                            <Badge tone="brand" className="capitalize">
-                                {dog.energy_level}
-                            </Badge>
-                        ) : (
-                            <span className="text-xs text-neutral-400">
-                                Not assessed
-                            </span>
-                        )}
-                    </div>
-
-                    <div>
-                        <h4 className="mb-2 text-xs font-semibold text-neutral-900 dark:text-neutral-100">
-                            Training
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                            <Chip active={Boolean(dog.potty_trained)}>
-                                Potty trained
-                            </Chip>
-                            <Chip
-                                active={
-                                    dog.training_level === 'basic' ||
-                                    dog.training_level === 'well_trained'
-                                }
-                            >
-                                Basic commands
-                            </Chip>
-                            <Chip active={Boolean(dog.leash_trained)}>
-                                Leash trained
-                            </Chip>
+                        <div className="flex items-center gap-3">
+                            <h4 className="text-xs font-semibold text-neutral-900 dark:text-neutral-100">
+                                Energy Level
+                            </h4>
+                            {dog.energy_level ? (
+                                <Badge tone="brand" className="capitalize">
+                                    {dog.energy_level}
+                                </Badge>
+                            ) : (
+                                <span className="text-xs text-neutral-400">
+                                    Not assessed
+                                </span>
+                            )}
                         </div>
-                    </div>
-                </CardContent>
-            </Card>
+
+                        <div>
+                            <h4 className="mb-2 text-xs font-semibold text-neutral-900 dark:text-neutral-100">
+                                Training
+                            </h4>
+                            <div className="flex flex-wrap gap-2">
+                                <Chip active={Boolean(dog.potty_trained)}>
+                                    Potty trained
+                                </Chip>
+                                <Chip
+                                    active={
+                                        dog.training_level === 'basic' ||
+                                        dog.training_level === 'well_trained'
+                                    }
+                                >
+                                    Basic commands
+                                </Chip>
+                                <Chip active={Boolean(dog.leash_trained)}>
+                                    Leash trained
+                                </Chip>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <RegisterDetails dog={dog} />
+            </div>
 
             <div className="space-y-6 lg:col-span-2">
                 <Card>
@@ -655,6 +659,96 @@ function OverviewTab({ dog }: { dog: Dog }) {
                 </Card>
             </div>
         </div>
+    );
+}
+
+/**
+ * Details from the client's Dog Register workbook, shown once a dog has
+ * been imported from it.
+ */
+function RegisterDetails({ dog }: { dog: Dog }) {
+    if (!dog.register_imported_at) {
+        return null;
+    }
+
+    const text = (value: string | null) => value ?? '—';
+    const link = (url: string | null) =>
+        url ? (
+            <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-all text-brand-700 underline dark:text-brand-300"
+            >
+                {url}
+            </a>
+        ) : (
+            '—'
+        );
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Dog Register</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+                <DetailList
+                    rows={[
+                        [
+                            'Publish to bot',
+                            dog.publish_to_bot === null
+                                ? '—'
+                                : dog.publish_to_bot
+                                  ? 'Yes'
+                                  : 'No',
+                        ],
+                        ['Adoption status', text(dog.adoption_status)],
+                        ['Foster status', text(dog.foster_status)],
+                        [
+                            'Expected adult size',
+                            <span key="size" className="capitalize">
+                                {text(dog.expected_adult_size)}
+                            </span>,
+                        ],
+                        [
+                            'Weight',
+                            dog.weight_kg
+                                ? `${Number(dog.weight_kg)} kg${dog.weighed_on ? ` (${formatDate(dog.weighed_on)})` : ''}`
+                                : '—',
+                        ],
+                        ['Children', text(dog.children_assessment)],
+                        [
+                            'Children observations',
+                            text(dog.children_observations),
+                        ],
+                        ['Dogs', text(dog.dogs_assessment)],
+                        ['Dogs observations', text(dog.dogs_observations)],
+                        ['Cats', text(dog.cats_assessment)],
+                        ['Cats observations', text(dog.cats_observations)],
+                        ['Owner experience', text(dog.owner_experience)],
+                        ['Home requirements', text(dog.home_requirements)],
+                        [
+                            'Alone time observations',
+                            text(dog.alone_time_observations),
+                        ],
+                        ['House training', text(dog.house_training)],
+                        ['Lead walking', text(dog.lead_walking)],
+                        ['Basic commands', text(dog.basic_commands_notes)],
+                        ['Vaccination status', text(dog.vaccination_status)],
+                        ['Care summary', text(dog.care_summary)],
+                        ['Feeding guidance', text(dog.feeding_guidance)],
+                        ['Profile URL', link(dog.profile_url)],
+                        [
+                            'Last reviewed',
+                            dog.last_reviewed_on
+                                ? `${formatDate(dog.last_reviewed_on)}${dog.reviewed_by ? ` by ${dog.reviewed_by}` : ''}`
+                                : '—',
+                        ],
+                        ['Last imported', formatDate(dog.register_imported_at)],
+                    ]}
+                />
+            </CardContent>
+        </Card>
     );
 }
 

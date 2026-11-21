@@ -50,6 +50,12 @@ export default function DogEdit({
             <Form action={update(dog.id)} className="space-y-6">
                 {({ errors, processing }) => (
                     <>
+                        <p className="rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-xs text-brand-800 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-200">
+                            Greyed-out fields come from the Dog Register. To
+                            change them, update the register file and import it
+                            again from All Dogs.
+                        </p>
+
                         <Card>
                             <CardHeader>
                                 <CardTitle>Basic Information</CardTitle>
@@ -59,6 +65,7 @@ export default function DogEdit({
                                     <Label htmlFor="name">Dog Name *</Label>
                                     <Input
                                         id="name"
+                                        disabled
                                         name="name"
                                         defaultValue={dog.name}
                                         required
@@ -91,6 +98,7 @@ export default function DogEdit({
                                     <Label htmlFor="gender">Gender</Label>
                                     <Select
                                         id="gender"
+                                        disabled
                                         name="gender"
                                         defaultValue={dog.gender ?? ''}
                                     >
@@ -109,6 +117,7 @@ export default function DogEdit({
                                     <Label htmlFor="breed">Breed / Mix</Label>
                                     <Input
                                         id="breed"
+                                        disabled
                                         name="breed"
                                         defaultValue={dog.breed ?? ''}
                                     />
@@ -119,6 +128,7 @@ export default function DogEdit({
                                     </Label>
                                     <Input
                                         id="date_of_birth"
+                                        disabled
                                         name="date_of_birth"
                                         type="date"
                                         defaultValue={dog.date_of_birth ?? ''}
@@ -127,6 +137,7 @@ export default function DogEdit({
                                 <div className="flex items-end gap-2 pb-2">
                                     <Checkbox
                                         id="date_of_birth_is_approximate"
+                                        disabled
                                         name="date_of_birth_is_approximate"
                                         value="1"
                                         defaultChecked={
@@ -144,6 +155,7 @@ export default function DogEdit({
                                     <Label htmlFor="size">Size</Label>
                                     <Select
                                         id="size"
+                                        disabled
                                         name="size"
                                         defaultValue={dog.size ?? ''}
                                     >
@@ -214,6 +226,7 @@ export default function DogEdit({
                                     </Label>
                                     <Textarea
                                         id="personality_description"
+                                        disabled
                                         name="personality_description"
                                         rows={2}
                                         defaultValue={
@@ -227,6 +240,7 @@ export default function DogEdit({
                                     </Label>
                                     <Select
                                         id="energy_level"
+                                        disabled
                                         name="energy_level"
                                         defaultValue={dog.energy_level ?? ''}
                                     >
@@ -264,6 +278,7 @@ export default function DogEdit({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="good_with_dogs"
+                                        disabled
                                         name="good_with_dogs"
                                         value="1"
                                         defaultChecked={!!dog.good_with_dogs}
@@ -278,6 +293,7 @@ export default function DogEdit({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="good_with_cats"
+                                        disabled
                                         name="good_with_cats"
                                         value="1"
                                         defaultChecked={!!dog.good_with_cats}
@@ -292,6 +308,7 @@ export default function DogEdit({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="good_with_children"
+                                        disabled
                                         name="good_with_children"
                                         value="1"
                                         defaultChecked={
@@ -322,6 +339,7 @@ export default function DogEdit({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="potty_trained"
+                                        disabled
                                         name="potty_trained"
                                         value="1"
                                         defaultChecked={!!dog.potty_trained}
@@ -336,6 +354,7 @@ export default function DogEdit({
                                 <div className="flex items-center gap-2">
                                     <Checkbox
                                         id="leash_trained"
+                                        disabled
                                         name="leash_trained"
                                         value="1"
                                         defaultChecked={!!dog.leash_trained}

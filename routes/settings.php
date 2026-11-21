@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Settings\AuditLogController;
 use App\Http\Controllers\Settings\AvatarController;
+use App\Http\Controllers\Settings\BackupController;
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\PreferenceController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SessionController;
 use App\Http\Controllers\Settings\UserController;
@@ -14,6 +16,7 @@ Route::middleware('auth')->group(function (): void {
     Route::put('settings/password', [PasswordController::class, 'update'])
         ->middleware('throttle:6,1')
         ->name('settings.password.update');
+    Route::patch('settings/preferences', PreferenceController::class)->name('settings.preferences.update');
     Route::post('settings/avatar', [AvatarController::class, 'store'])->name('settings.avatar.store');
     Route::delete('settings/avatar', [AvatarController::class, 'destroy'])->name('settings.avatar.destroy');
     Route::get('users/{user}/avatar', [AvatarController::class, 'show'])->name('users.avatar');
@@ -27,6 +30,13 @@ Route::middleware('auth')->group(function (): void {
         Route::put('settings/users/{user}', [UserController::class, 'update'])->name('settings.users.update');
         Route::patch('settings/users/{user}/status', [UserController::class, 'updateStatus'])->name('settings.users.status');
         Route::put('settings/users/{user}/password', [UserController::class, 'resetPassword'])->name('settings.users.password');
+    });
+
+    Route::middleware('can:manage-backups')->group(function (): void {
+        Route::get('settings/backups', [BackupController::class, 'index'])->name('settings.backups.index');
+        Route::post('settings/backups', [BackupController::class, 'store'])->middleware('throttle:3,10')->name('settings.backups.store');
+        Route::get('settings/backups/{file}', [BackupController::class, 'download'])->where('file', '[A-Za-z0-9._-]+\.zip')->name('settings.backups.download');
+        Route::delete('settings/backups/{file}', [BackupController::class, 'destroy'])->where('file', '[A-Za-z0-9._-]+\.zip')->name('settings.backups.destroy');
     });
 
     Route::get('settings/logs', [AuditLogController::class, 'index'])

@@ -19,14 +19,24 @@ class MakeAdminUserCommand extends Command
     public function handle(): int
     {
         $user = User::create([
-            'name' => $this->argument('name'),
-            'email' => $this->argument('email'),
-            'password' => Hash::make($this->argument('password')),
+            'name' => $this->textArgument('name'),
+            'email' => $this->textArgument('email'),
+            'password' => Hash::make($this->textArgument('password')),
             'role' => UserRole::Admin,
         ]);
 
         $this->info("Admin user created: {$user->email}");
 
         return self::SUCCESS;
+    }
+
+    /**
+     * A text argument; required arguments always arrive as strings.
+     */
+    private function textArgument(string $name): string
+    {
+        $value = $this->argument($name);
+
+        return is_string($value) ? $value : '';
     }
 }

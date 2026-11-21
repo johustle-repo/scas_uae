@@ -12,7 +12,8 @@ export type Permission =
     | 'manage-placements'
     | 'manage-documents'
     | 'manage-users'
-    | 'view-audit-log';
+    | 'view-audit-log'
+    | 'manage-backups';
 
 export type User = {
     id: number;
@@ -21,6 +22,7 @@ export type User = {
     avatar_url: string | null;
     role: UserRole;
     is_active: boolean;
+    show_archived_records?: boolean;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;

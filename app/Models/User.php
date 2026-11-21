@@ -23,13 +23,14 @@ use Illuminate\Support\Carbon;
  * @property-read string|null $avatar_url
  * @property UserRole $role
  * @property bool $is_active
+ * @property bool $show_archived_records
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['name', 'email', 'avatar_path', 'password', 'role', 'is_active'])]
+#[Fillable(['name', 'email', 'avatar_path', 'password', 'role', 'is_active', 'show_archived_records'])]
 #[Hidden(['password', 'remember_token', 'avatar_path'])]
 class User extends Authenticatable
 {
@@ -68,6 +69,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => UserRole::class,
             'is_active' => 'boolean',
+            'show_archived_records' => 'boolean',
         ];
     }
 

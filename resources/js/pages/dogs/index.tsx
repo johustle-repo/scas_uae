@@ -6,6 +6,7 @@ import {
     type DogFilters,
     type MultiFilterKey,
 } from '@/components/dogs/filter-panel';
+import { RegisterImport } from '@/components/dogs/register-import';
 import { StatusBadge } from '@/components/dogs/status-badge';
 import {
     AlertIcon,
@@ -14,12 +15,12 @@ import {
     CloseIcon,
     DownloadIcon,
     PawIcon,
-    PlusIcon,
     ResetIcon,
     SearchIcon,
     TrashIcon,
 } from '@/components/icons';
 import { PageHeader } from '@/components/page-header';
+import { Badge } from '@/components/ui/badge';
 import { buttonClasses } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -153,13 +154,7 @@ export default function DogsIndex({
                 actions={
                     can('manage-dogs') && (
                         <div className="flex flex-col items-stretch gap-2">
-                            <Link
-                                href={dogsRoutes.create.url()}
-                                className={buttonClasses('primary', 'sm')}
-                            >
-                                <PlusIcon className="size-3.5" />
-                                Add New Dog
-                            </Link>
+                            <RegisterImport />
                             <ExportMenu />
                         </div>
                     )
@@ -376,7 +371,17 @@ export default function DogsIndex({
                                     {formatAge(dog.date_of_birth)}
                                 </TableCell>
                                 <TableCell>
-                                    <StatusBadge status={dog.current_status} />
+                                    <div className="flex flex-wrap items-center gap-1">
+                                        <StatusBadge
+                                            status={dog.current_status}
+                                        />
+                                        {dog.archived_at &&
+                                            !showingArchived && (
+                                                <Badge tone="neutral">
+                                                    Archived
+                                                </Badge>
+                                            )}
+                                    </div>
                                 </TableCell>
                                 <TableCell>
                                     {placementLabel(dog.current_status) ?? '—'}

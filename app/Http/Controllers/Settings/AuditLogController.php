@@ -25,6 +25,7 @@ class AuditLogController extends Controller
         'document' => 'Documents & photos',
         'user' => 'User management',
         'import' => 'Import / export',
+        'backup' => 'Backups',
     ];
 
     /**
@@ -40,6 +41,7 @@ class AuditLogController extends Controller
         'document' => ['document.', 'photo.'],
         'user' => ['user.'],
         'import' => ['import.', 'export.'],
+        'backup' => ['backup.'],
     ];
 
     /**

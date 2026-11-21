@@ -16,7 +16,7 @@ class ImportLegacyDogsCommand extends Command
 {
     public function handle(LegacyDogImportService $importer): int
     {
-        $path = (string) $this->argument('path');
+        $path = $this->textArgument('path');
         $dryRun = (bool) $this->option('dry-run');
 
         if (! is_file($path)) {
@@ -61,5 +61,15 @@ class ImportLegacyDogsCommand extends Command
         ]);
 
         return self::SUCCESS;
+    }
+
+    /**
+     * A text argument; required arguments always arrive as strings.
+     */
+    private function textArgument(string $name): string
+    {
+        $value = $this->argument($name);
+
+        return is_string($value) ? $value : '';
     }
 }

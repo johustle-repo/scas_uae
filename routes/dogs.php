@@ -10,6 +10,7 @@ use App\Http\Controllers\Dogs\FosterRecordController;
 use App\Http\Controllers\Dogs\IdentificationController;
 use App\Http\Controllers\Dogs\MedicalProfileController;
 use App\Http\Controllers\Dogs\PhotoController;
+use App\Http\Controllers\Dogs\RegisterImportController;
 use App\Http\Controllers\Dogs\RescueIntakeController;
 use App\Http\Controllers\Dogs\VaccinationController;
 use Illuminate\Support\Facades\Route;
@@ -19,8 +20,11 @@ Route::middleware('auth')->group(function (): void {
 
     Route::middleware('can:manage-dogs')->group(function (): void {
         Route::get('dogs/create', [DogController::class, 'create'])->name('dogs.create');
-        Route::get('dogs/export/{format}', ExportController::class)->whereIn('format', ['excel', 'pdf'])->name('dogs.export');
+        Route::get('dogs/export/{format}', ExportController::class)->whereIn('format', ['excel', 'pdf'])->middleware('throttle:10,1')->name('dogs.export');
         Route::post('dogs', [DogController::class, 'store'])->name('dogs.store');
+        Route::post('dogs/import', [RegisterImportController::class, 'preview'])->middleware('throttle:10,1')->name('dogs.import');
+        Route::post('dogs/import/confirm', [RegisterImportController::class, 'confirm'])->middleware('throttle:10,1')->name('dogs.import.confirm');
+        Route::delete('dogs/import', [RegisterImportController::class, 'cancel'])->name('dogs.import.cancel');
         Route::delete('dogs', BulkDeleteController::class)->name('dogs.bulk-destroy');
         Route::get('dogs/{dog}/edit', [DogController::class, 'edit'])->name('dogs.edit');
         Route::put('dogs/{dog}', [DogController::class, 'update'])->name('dogs.update');

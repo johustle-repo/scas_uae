@@ -1,11 +1,14 @@
 import { destroy } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import {
+    AlertIcon,
     ArchiveIcon,
     BuildingIcon,
     ChevronDownIcon,
     CloseIcon,
     DashboardIcon,
+    FileIcon,
     FlowerIcon,
+    FolderIcon,
     GlobeIcon,
     HeartIcon,
     HistoryIcon,
@@ -15,7 +18,6 @@ import {
     MoonIcon,
     PawIcon,
     PlaneIcon,
-    PlusIcon,
     ReturnIcon,
     SunIcon,
     UsersIcon,
@@ -28,7 +30,9 @@ import { useCan } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 import { dashboard, home } from '@/routes';
 import adoptionRequestsRoutes from '@/routes/adoption-requests';
+import alertsRoutes from '@/routes/alerts';
 import dogsRoutes from '@/routes/dogs';
+import reportsRoutes from '@/routes/reports';
 import settingsRoutes from '@/routes/settings';
 import type { Auth, User } from '@/types/auth';
 import type { DogStatus } from '@/types/dog';
@@ -112,16 +116,18 @@ export function Sidebar({
                 !currentStatus &&
                 !isShowingArchived,
         },
-        ...(can('manage-dogs')
-            ? [
-                  {
-                      label: 'Add New Dog',
-                      href: dogsRoutes.create.url(),
-                      icon: PlusIcon,
-                      active: path === '/dogs/create',
-                  },
-              ]
-            : []),
+        {
+            label: 'Alerts',
+            href: alertsRoutes.index.url(),
+            icon: AlertIcon,
+            active: path === '/alerts',
+        },
+        {
+            label: 'Reports',
+            href: reportsRoutes.index.url(),
+            icon: FileIcon,
+            active: path.startsWith('/reports'),
+        },
         {
             label: 'Archived',
             href: dogsRoutes.index.url({ query: { archived: 'only' } }),
@@ -156,6 +162,16 @@ export function Sidebar({
                       href: settingsRoutes.users.index.url(),
                       icon: UsersIcon,
                       active: path === '/settings/users',
+                  },
+              ]
+            : []),
+        ...(can('manage-backups')
+            ? [
+                  {
+                      label: 'Backups',
+                      href: settingsRoutes.backups.index.url(),
+                      icon: FolderIcon,
+                      active: path === '/settings/backups',
                   },
               ]
             : []),

@@ -36,7 +36,7 @@ class DogController extends Controller
         $dogs = Dog::query()
             ->with(['identification', 'vaccinations'])
             ->when(
-                $request->string('archived')->toString(),
+                $request->string('archived')->toString() ?: ($request->user()?->show_archived_records ? 'include' : ''),
                 fn ($query, string $archived) => $archived === 'only' ? $query->archived() : $query,
                 fn ($query) => $query->active(),
             )

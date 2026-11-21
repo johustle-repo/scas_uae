@@ -4,6 +4,7 @@ import {
     AlertIcon,
     ArrowRightIcon,
     BuildingIcon,
+    CheckIcon,
     DashboardIcon,
     GlobeIcon,
     HeartIcon,
@@ -24,8 +25,11 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { AuthenticatedLayout } from '@/layouts/authenticated-layout';
+import { alertToneClasses, type AlertSummary } from '@/lib/alerts';
 import { cn } from '@/lib/utils';
+import alertsRoutes from '@/routes/alerts';
 import dogsRoutes from '@/routes/dogs';
+import reportsRoutes from '@/routes/reports';
 import { formatDate, type Dog } from '@/types/dog';
 import { Head, Link, router } from '@inertiajs/react';
 import {
@@ -47,6 +51,8 @@ interface DashboardStats {
 interface DashboardProps {
     stats: DashboardStats;
     recentlyUpdated: Dog[];
+    /** Deferred: undefined until loaded after the first render. */
+    alerts?: AlertSummary[];
 }
 
 const statCards: {
@@ -90,7 +96,11 @@ const statCards: {
     },
 ];
 
-export default function Dashboard({ stats, recentlyUpdated }: DashboardProps) {
+export default function Dashboard({
+    stats,
+    recentlyUpdated,
+    alerts,
+}: DashboardProps) {
     const [query, setQuery] = useState('');
 
     function submitSearch(e: FormEvent) {
@@ -178,6 +188,8 @@ export default function Dashboard({ stats, recentlyUpdated }: DashboardProps) {
                 })}
             </div>
 
+            <AlertsPanel alerts={alerts} />
+
             <h2 className="mb-3 text-base font-semibold text-neutral-900 dark:text-neutral-100">
                 Recently Updated Records
             </h2>
@@ -231,7 +243,13 @@ export default function Dashboard({ stats, recentlyUpdated }: DashboardProps) {
                 </Table>
             </Card>
 
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex justify-end gap-2">
+                <Link
+                    href={reportsRoutes.index.url()}
+                    className={buttonClasses('secondary', 'sm')}
+                >
+                    Reports
+                </Link>
                 <Link
                     href={dogsRoutes.index.url()}
                     className={buttonClasses('primary', 'sm')}
@@ -241,6 +259,62 @@ export default function Dashboard({ stats, recentlyUpdated }: DashboardProps) {
                 </Link>
             </div>
         </>
+    );
+}
+
+function AlertsPanel({ alerts }: { alerts?: AlertSummary[] }) {
+    return (
+        <section className="mb-6">
+            <div className="mb-3 flex items-center justify-between">
+                <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                    Alerts
+                </h2>
+                <Link
+                    href={alertsRoutes.index.url()}
+                    className="flex items-center gap-1 text-xs font-medium text-brand-700 hover:text-brand-900 dark:text-brand-300"
+                >
+                    View all
+                    <ArrowRightIcon className="size-3" />
+                </Link>
+            </div>
+            {alerts === undefined ? (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {[1, 2, 3].map((row) => (
+                        <div
+                            key={row}
+                            className="h-14 animate-pulse rounded-xl bg-neutral-100 dark:bg-neutral-800"
+                        />
+                    ))}
+                </div>
+            ) : alerts.length === 0 ? (
+                <Card className="flex items-center gap-2 p-4 text-xs text-neutral-600 dark:text-neutral-300">
+                    <CheckIcon className="size-4 text-success-600" />
+                    Nothing needs attention right now.
+                </Card>
+            ) : (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {alerts.map((alert) => (
+                        <Link
+                            key={alert.key}
+                            href={`${alertsRoutes.index.url()}#${alert.key}`}
+                            className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-xs transition hover:border-brand-200 hover:shadow-sm dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-brand-800"
+                        >
+                            <span className="text-neutral-700 dark:text-neutral-200">
+                                {alert.title}
+                            </span>
+                            <span
+                                className={cn(
+                                    'rounded-full px-2 py-0.5 font-semibold ring-1',
+                                    alertToneClasses[alert.tone],
+                                )}
+                            >
+                                {alert.count}
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </section>
     );
 }
 

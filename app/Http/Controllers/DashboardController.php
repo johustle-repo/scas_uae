@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\DogStatus;
 use App\Models\Dog;
+use App\Services\DogAlerts;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -12,9 +13,10 @@ class DashboardController extends Controller
     /**
      * Display the dashboard overview.
      */
-    public function __invoke(): Response
+    public function __invoke(DogAlerts $alerts): Response
     {
         return Inertia::render('dashboard', [
+            'alerts' => Inertia::defer(fn (): array => $alerts->summary()),
             'stats' => [
                 'total' => Dog::query()->active()->count(),
                 'atScas' => Dog::query()->active()->status(DogStatus::AtScas)->count(),

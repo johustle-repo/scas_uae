@@ -13,6 +13,7 @@ import {
     UsersIcon,
     type IconProps,
 } from '@/components/icons';
+import { DEFAULT_DOG_PHOTO } from '@/components/dogs/dog-avatar';
 import { store as storeApplication } from '@/actions/App/Http/Controllers/AdoptionApplicationController';
 import { AppLogo } from '@/components/app-logo';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -1043,9 +1044,11 @@ function DogPhoto({ dog, className }: { dog: PublicDog; className?: string }) {
                 strokeWidth={1}
             />
             <div className="relative text-center">
-                <span className="mx-auto flex size-16 items-center justify-center rounded-full bg-white/70 text-2xl font-bold text-brand-800 shadow-lg dark:bg-white/10 dark:text-brand-100">
-                    {dog.name.charAt(0).toUpperCase()}
-                </span>
+                <img
+                    src={DEFAULT_DOG_PHOTO}
+                    alt=""
+                    className="mx-auto size-20 rounded-full bg-white/80 object-contain p-2 shadow-lg dark:bg-white/10"
+                />
                 <span className="mt-2 block text-xs font-medium text-brand-800/80 dark:text-brand-200/70">
                     Photo coming soon
                 </span>
